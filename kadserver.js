@@ -42,8 +42,8 @@ new MongoClient(url)
   .then(client => {
     console.log('DB 연결 성공');
     db = client.db('test_kad');
-  app.listen(8080, () => {
-      console.log('Server listening on 8080');
+  app.listen(port, () => {
+      console.log('Server listening on ${port}');
     });
   })
   .catch(err => {
