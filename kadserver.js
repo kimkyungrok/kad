@@ -336,12 +336,10 @@ app.post('/write', async (req, res) => {
 
     // 제목 자동 생성
     const now = new Date();
-    const D = n => n.toString().padStart(2, '0');
-
-    const datePart = `${now.getFullYear()}.${D(now.getMonth() + 1)}.${D(now.getDate())}`;
-    const timePart = `${D(now.getHours())}-${D(now.getMinutes())}`; // ":" 는 파일명에서 사용 불가
-
-    const generatedTitle = `정산서 ${datePart} ${timePart}_${riderName}_${branch}`;
+    const D = d => d.toString().padStart(2, '0');
+    const hour = now.getHours(), ampm = hour < 12 ? '오전' : '오후', hour12 = hour % 12 || 12;
+    const minutes = D(now.getMinutes());
+    const generatedTitle = `정산서 ${now.getFullYear()}.${D(now.getMonth()+1)}.${D(now.getDate())} ${ampm} ${hour12}:${minutes}`;
 
     const newPost = {
       title: generatedTitle,
