@@ -1,7 +1,7 @@
 {
-  "name": "kad-server",
+  "name": "kadserver",
   "version": "1.0.0",
-  "main": "kad-server.js",
+  "main": "kadserver.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
