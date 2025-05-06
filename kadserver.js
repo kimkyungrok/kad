@@ -8,9 +8,10 @@ const { MongoClient, ObjectId } = require('mongodb');  // 꼭 여기까지!!
 const engine = require('ejs-mate');
 const multer = require('multer');
 const XLSX = require('xlsx');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'public/uploads/' });
 const fs = require('fs');
 const port = process.env.PORT || 3000;
+
 
 app.use('/uploads', express.static('/public/uploads'));
 app.use(express.static(__dirname + '/public'));
@@ -568,19 +569,15 @@ app.post('/delete-user/:id', async (req, res) => {
 //메인화면 이미지 등록
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'public/uploads/'); // 저장 폴더
+    cb(null, 'public/uploads/');
   },
   filename: (req, file, cb) => {
     const now = new Date();
     const D = n => n.toString().padStart(2, '0');
-
     const datePart = `${now.getFullYear()}.${D(now.getMonth() + 1)}.${D(now.getDate())}`;
-    const timePart = `${D(now.getHours())}-${D(now.getMinutes())}`; // ":" 는 파일명에서 사용 불가
-
-    const koreanTime = `${datePart} ${timePart}`; // ← 백틱 사용!
-    const filename = 'welcome-' + koreanTime + path.extname(file.originalname);
-
-    cb(null, filename);
+    const timePart = `${D(now.getHours())}-${D(now.getMinutes())}`;
+    const koreanTime = `${datePart} ${timePart}`;
+    cb(null, 'welcome-' + koreanTime + path.extname(file.originalname));
   }
 });
 
