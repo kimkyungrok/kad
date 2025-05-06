@@ -1,0 +1,66 @@
+<style>
+    .footer-bar {
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+      z-index: 1030;
+      transition: bottom 1s;
+    }
+  
+    /* 위치 조정용 클래스 */
+    .footer-hidden {
+      bottom: -100px !important;
+    }
+  
+    .footer-up {
+      bottom: 60px !important;
+    }
+  
+    /* 내부 콘텐츠 정렬 제어 */
+    .footer-content {
+      display: flex;
+      justify-content: space-between; /* 이미지와 텍스트 양쪽 정렬 */
+      align-items: center;           /* 수직 정렬 */
+      flex-wrap: wrap;               /* 좁은 화면 대응 */
+      padding: 10px 20px;
+    }
+  
+    .footer-logo {
+      width: 150px;
+      height: auto;
+    }
+  
+    .footer-text {
+      font-size: 0.9rem;
+      margin-left: 20px;
+      white-space: nowrap;
+    }
+  
+    @media (max-width: 576px) {
+      .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+  
+      .footer-text {
+        margin-left: 0;
+        margin-top: 8px;
+      }
+    }
+  </style>
+  
+
+  
+
+<!-- 푸터 네비게이션 바 -->
+<nav id="footerBar" class="footer-bar">
+    <div class="container footer-content">
+      <img src="/images/logo.png" alt="로고" class="footer-logo">
+      <div class="footer-text">
+        © 2025 KAD Co. All rights reserved.
+      </div>
+    </div>
+</nav>

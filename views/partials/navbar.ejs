@@ -1,24 +1,30 @@
 <head>
-  ...
   <style>
     body {
-      padding-top: 60px;
+      padding-top: 25px;
+    }
+
+    .navbar-text {
+      font-size: 15px;
+      margin-left: 15px;
+      white-space: nowrap;
     }
   </style>
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
   <div class="container-fluid">
-    <a class="navbar-brand d-flex align-items-center" href="/">
+    <a class="navbar-brand d-flex align-items-center" href="/home">
       <img src="/images/logo.png" alt="로고" width="250" height="40" class="d-inline-block align-text-top">
-      <h3><span class="ms-3">라이더 정산/관리 시스템</span></h3>
+      <span class= navbar-text>라이더 정산/관리 시스템</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/">홈</a></li>
+      <ul class="nav nav-pills">
+        <li class="nav-item">
+          <a class="nav-link" href="/">홈</a></li>
 
         <% if (!user) { %>
           <li class="nav-item"><a class="nav-link" href="/register">회원가입</a></li>
@@ -32,9 +38,9 @@
                 관리자 메뉴
               </a>
               <ul class="dropdown-menu">
-                <li class="nav-item"><a class="nav-link" href="/users">소속 라이더 리스트</a></li>
-                <li class="nav-item"><a class="nav-link" href="/my-posts">정산서 등록</a></li>
-                <li class="nav-item"><a class="nav-link" href="/promoReg">프로모션 등록</a></li>
+                <li class="nav-item"><a class="dropdown-item" href="/users">소속 라이더 리스트</a></li>
+                <li class="nav-item"><a class="dropdown-item" href="/my-posts">정산서 등록</a></li>
+                <li class="nav-item"><a class="dropdown-item" href="/promoReg">프로모션 등록</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li class="nav-item"><a class="nav-link" href="/accounts">정산서 파일 업로드</a></li>
               </ul>
@@ -45,10 +51,10 @@
               MY Page
             </a>
             <ul class="dropdown-menu">
-              <li class="nav-item"><a class="nav-link" href="/my-page">나의 등록 정보</a></li>
-              <li class="nav-item"><a class="nav-link" href="/my-posts">정산서 리스트</a></li>
+              <li class="nav-item"><a class="dropdown-item" href="/my-page">나의 등록 정보</a></li>
+              <li class="nav-item"><a class="dropdown-item" href="/my-posts">정산서 리스트</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li class="nav-item"><a class="nav-link" href="/terminate">탈퇴</a></li>
+              <li class="nav-item"><a class="dropdown-item" href="/terminate">탈퇴</a></li>
             </ul>
           </li>
           <li class="nav-item"><a class="nav-link" href="/logout">로그아웃</a></li>

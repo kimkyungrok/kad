@@ -15,28 +15,40 @@
     <p>가입 지사: <%= user.branch %></p>
   <% } %>
 
-  <!-- 파일 업로드 (krogy, admin 전용) -->
-  <% if (user.username === 'krogy' || user.username === 'admin') { %>
-    <div class="mt-4">
-      <form id="uploadForm" action="/upload-welcome-image" method="POST" enctype="multipart/form-data">
-        <input type="file" id="fileInput" name="welcomeImage" class="form-control mb-2" accept="image/*" required>
-        <button type="submit" class="btn btn-success w-100">파일 업로드</button>
-      </form>
+<!-- 파일 업로드 (krogy, admin 전용) -->
+<% if (user.username === 'krogy' || user.username === 'admin') { %>
+  <div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow rounded-3">
+      <div class="card-body">
+        <h5 class="card-title text-center mb-3">이미지 업로드</h5>
+        <form id="uploadForm" action="/upload-welcome-image" method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <input type="file" id="fileInput" name="welcomeImage" class="form-control" accept="image/*" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">파일 업로드</button>
+        </form>
+      </div>
     </div>
-  <% } %>
+  </div>
+<% } %>
 
   <!-- 업로드된 이미지 미리보기 (모든 유저에게 보여줌) -->
   <% if (uploadedImagePath) { %>
-    <div class="mt-4">
-      <h5>공지 사항</h5>
-      <img src="<%= uploadedImagePath %>" alt="업로드된 이미지" class="img-fluid mt-2">
+    <div class="container mt-4" style="max-width: 600px;">
+      <div class="card shadow rounded-3">
+        <div class="card-body">
+          <h5 class="card-title text-center">공지 사항</h5>
+          <img src="<%= uploadedImagePath %>" alt="업로드된 이미지" class="img-fluid mt-3 rounded">
+        </div>
+      </div>
     </div>
   <% } %>
+  
 
   <!-- 이동 버튼 -->
-  <div class="mt-4">
+  <!--<div class="mt-4">-->
     <!--<a href="/my-posts" class="btn btn-primary">게시판 이동</a>-->
-    <a href="/logout" class="btn btn-secondary ms-2">로그아웃</a>
-  </div>
+    <!--<a href="/logout" class="btn btn-secondary ms-2">로그아웃</a>-->
+  <!--</div>-->
 
 </div>

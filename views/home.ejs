@@ -17,10 +17,10 @@
 
 <!-- 파일 업로드 (krogy, admin 전용) -->
 <% if (user.username === 'krogy' || user.username === 'admin') { %>
-  <div class="container mt-5" style="max-width: 100px;">
+  <div class="container mt-5" style="max-width: 600px;">
     <div class="card shadow rounded-3">
       <div class="card-body">
-        <h5 class="card-title text-center mb-3">환영 이미지 업로드</h5>
+        <h5 class="card-title text-center mb-3">이미지 업로드</h5>
         <form id="uploadForm" action="/upload-welcome-image" method="POST" enctype="multipart/form-data">
           <div class="mb-3">
             <input type="file" id="fileInput" name="welcomeImage" class="form-control" accept="image/*" required>
@@ -46,9 +46,9 @@
   
 
   <!-- 이동 버튼 -->
-  <div class="mt-4">
+  <!--<div class="mt-4">-->
     <!--<a href="/my-posts" class="btn btn-primary">게시판 이동</a>-->
-    <a href="/logout" class="btn btn-secondary ms-2">로그아웃</a>
-  </div>
+    <!--<a href="/logout" class="btn btn-secondary ms-2">로그아웃</a>-->
+  <!--</div>-->
 
 </div>
