@@ -10,6 +10,7 @@ const multer = require('multer');
 const XLSX = require('xlsx');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
+const port = process.env.PORT || 3000;
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -41,7 +42,7 @@ new MongoClient(url)
   .then(client => {
     console.log('DB 연결 성공');
     db = client.db('test_kad');
-    app.listen(8080, () => {
+  app.listen(8080, () => {
       console.log('Server listening on 8080');
     });
   })
@@ -49,6 +50,7 @@ new MongoClient(url)
     console.error('DB 연결 에러:', err);
   });
   
+
 // 로그인 필요 미들웨어
 function 로그인필요(req, res, next) {
   if (req.session.user) {
