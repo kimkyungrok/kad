@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>홈페이지</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* 폰트 설정 */
+    body {
+      margin: 0;
+      font-family: "배달의민족 주아 OTF";
+      font-size: 16px; 
+    }
+  </style>
+</head>
+<body>
+  <!-- Bootstrap 네비게이션 바 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="images/logo.png" alt="로고" width="300" height="40" class="d-inline-block align-text-top">
+        <span class="ms-2">KAD</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">홈</a></li>
+          <li class="nav-item"><a class="nav-link" href="/register">회원가입</a></li>
+          <li class="nav-item"><a class="nav-link" href="/login">로그인</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 페이지 본문 -->
+  <div class="container mt-5">
+    <h2 class="text-center">환영합니다!</h2>
+    <p class="text-center">배민 플러스 KAD팀 입니다.</p>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="bg-light text-center p-3 mt-5">
+    &copy; 2025 배민 비즈커넥트 KAD
+  </footer>
+
+  <!-- Bootstrap JS (옵션) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4">등록된 유저 목록</h2>
+
+  <!-- 검색 및 필터 영역 -->
+  <div class="row mb-4">
+    <div class="col-md-4 mb-2">
+      <select id="branchFilter" class="form-select">
+        <option value="">가입 지사 선택 (전체)</option>
+        <% 
+          const branches = [...new Set(users.map(u => u.branch))]; 
+          branches.forEach(branch => { 
+        %>
+          <option value="<%= branch %>"><%= branch %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="col-md-4 mb-2">
+      <input type="text" id="searchInput" class="form-control" placeholder="아이디 또는 이름 검색">
+    </div>
+
+    <div class="col-md-4 mb-2">
+      <button class="btn btn-primary w-100" onclick="resetFilters()">필터 초기화</button>
+    </div>
+  </div>
+
+  <% if (users.length > 0) { %>
+    <table class="table table-striped" id="userTable">
+      <thead>
+        <tr>
+          <th>아이디</th>
+          <th>이름</th>
+          <th>배민커넥트 아이디</th>
+          <th>전화번호</th>
+          <th>가입 지사</th>
+          <th>가입일</th>
+          <th>관리</th> <!-- ✨ 관리 버튼 추가 -->
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <% users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(user => { %>
+          <tr>
+            <td><%= user.username %></td>
+            <td><%= user.name %></td>
+            <td><%= user.connectId %></td>
+            <td><%= user.phone %></td>
+            <td><%= user.branch %></td>
+            <td><%= new Date(user.createdAt).toLocaleDateString('ko-KR') %></td>
+            <td>
+              <div class="d-flex flex-column align-items-center">
+                <a href="/edit-user/<%= user._id %>" 
+                   class="btn btn-warning mb-2 custom-btn">수정</a>
+            
+                <form action="/delete-user/<%= user._id %>" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                  <button type="submit" class="btn btn-danger custom-btn">삭제</button>
+                </form>
+              </div>
+            </td>            
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>등록된 유저가 없습니다.</p>
+  <% } %>
+
+  <div class="mt-4">
+    <a href="/" class="btn btn-secondary">홈으로</a>
+  </div>
+</div>
+
+<script>
+// 검색과 필터 기능
+const searchInput = document.getElementById('searchInput');
+const branchFilter = document.getElementById('branchFilter');
+const tableBody = document.getElementById('userTableBody');
+
+searchInput.addEventListener('input', filterTable);
+branchFilter.addEventListener('change', filterTable);
+
+function filterTable() {
+  const searchText = searchInput.value.toLowerCase();
+  const selectedBranch = branchFilter.value;
+  const rows = tableBody.querySelectorAll('tr');
+
+  rows.forEach(row => {
+    const username = row.children[0].textContent.toLowerCase();
+    const name = row.children[1].textContent.toLowerCase();
+    const branch = row.children[4].textContent;
+
+    const matchesSearch = username.includes(searchText) || name.includes(searchText);
+    const matchesBranch = !selectedBranch || branch === selectedBranch;
+
+    if (matchesSearch && matchesBranch) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
+// 필터 초기화
+function resetFilters() {
+  searchInput.value = '';
+  branchFilter.value = '';
+  filterTable();
+}
+
+</script>

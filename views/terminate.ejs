@@ -1,0 +1,11 @@
+<% layout('layout') %>
+
+<div class="container mt-5 text-center">
+  <h3 class="mb-4">정말 탈퇴하시겠습니까?</h3>
+  <p class="text-danger mb-4">이 작업은 되돌릴 수 없습니다.</p>
+
+  <form action="/delete-account" method="POST">
+    <button type="submit" class="btn btn-danger">회원 탈퇴</button>
+    <a href="/" class="btn btn-secondary">취소</a>
+  </form>
+</div>

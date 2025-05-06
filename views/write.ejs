@@ -1,0 +1,414 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">정산서 등록</h2>
+
+  <form id="writeForm" action="/write" method="POST">
+
+    <!-- 협력사 등록 그룹 -->
+<div class="border rounded p-4 mb-4">
+    <h4 class="mb-4">라이더 정산 정보 검색</h4>
+  
+    <div class="mb-3">
+        <label for="name" class="form-label">이름 (회원 이름)</label>
+        <div class="input-group">
+          <input style="background-color: #bce9fc;" type="text" class="form-control" id="name" name="name" required placeholder="이름 입력">
+          <button type="button" id="searchNameBtn" class="btn btn-outline-primary">검색</button>
+        </div>
+      </div>
+
+    <div class="mb-3">
+      <label for="username" class="form-label">아이디 (자동입력)</label>
+      <input style="background-color: #bce9fc;" type="text" class="form-control" id="username" name="username" readonly>
+    </div>
+  
+    <div class="mb-3">
+       <label for="branch" class="form-label">소속 지사</label>
+       <input  style="background-color: #bce9fc;" type="text" class="form-control" id="branch" name="branch" readonly placeholder="자동입력">
+    </div>
+  
+    <div class="mb-3">
+      <label for="title" class="form-label">제목</label>
+      <input style="background-color: #bce9fc;" type="text" class="form-control" id="title" name="title" readonly required>
+    </div>
+  
+    <input type="hidden" id="userName" name="userName">
+  </div>
+ 
+    <!-- 정산 내역 그룹 -->
+    <div class="border rounded p-4 mb-4">
+      <h4 class="mb-4">정산 내역서</h4>
+
+      <table class="table table-bordered">
+
+        <!-- 1. 라이더 정보 그룹 -->
+        <tr class="table-secondary">
+          <th colspan="4" class="text-center">라이더 정보</th>
+        </tr>
+        <tr>
+            <td style="background-color: #b2d0f5;">라이더 명</td>
+            <td><input type="text" name="riderName" class="form-control" readonly></td>
+            <td style="background-color: #b2d0f5;">수행 건수</td>
+            <td>
+              <div class="input-group">
+                <input type="text" name="taskCount" class="form-control" readonly>
+                <span class="input-group-text bg-success text-white d-none" id="taskCountStatus">자동입력 완료</span>
+              </div>
+            </td>
+          </tr>
+          
+        <tr>
+          <td style="background-color: #b2d0f5;">주민번호</td>
+          <td colspan="3"><input type="text" name="residentId" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #b2d0f5;">은행명</td>
+          <td colspan="1"><input type="text" name="bankName" class="form-control"></td>
+          <td style="background-color: #b2d0f5;">예금주</td>
+          <td colspan="2"><input type="text" name="depositAccount" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #b2d0f5;">입금 계좌 번호</td>
+          <td colspan="3"><input type="text" name="accountNumber" class="form-control"></td>
+        </tr>
+        <!-- 2. 배달료 기준 내역 그룹 -->
+        <tr class="table-secondary">
+          <th colspan="4" class="text-center">배달료 기준 내역</th>
+        </tr>
+        <tr>
+          <td style="background-color: #d1eaf7;">배달료 A</td>
+          <td><input type="text" name="deliveryFeeA" class="form-control"></td>
+          <td style="background-color: #d1eaf7;">추가지급 B</td>
+          <td><input type="text" name="additionalPaymentB" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #b2ddf5;">총 배달료 C (A+B)</td>
+          <td colspan="3"><input type="text" name="totalDeliveryFeeC" class="form-control"></td>
+        </tr>
+        <tr>
+          <td colspan="4"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #d1eaf7;">보수액</td>
+          <td><input type="text" name="paymentAmount" class="form-control"></td>
+          <td style="background-color: #d1eaf7;">필요경비</td>
+          <td><input type="text" name="necessaryExpense" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #edffd8;">라이더부담 고용보험료 (2)</td>
+          <td><input type="text" name="riderEmploymentInsurance" class="form-control"></td>
+          <td style="background-color: #edffd8;">라이더부담 산재보험료 (4)</td>
+          <td><input type="text" name="riderIndustrialInsurance" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #fadcff;">고용보험 소급정산 (라이더) (6)</td>
+          <td><input type="text" name="riderRetroEmployment" class="form-control"></td>
+          <td style="background-color: #fadcff;">산재보험 소급정산 (라이더) (8)</td>
+          <td><input type="text" name="riderRetroIndustrial" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #b2f5d8;">시간제보험료(D)</td>
+          <td colspan="1"><input type="text" name="insuranceFee" class="form-control"></td>
+        </tr>
+        <tr>
+          <td colspan="4"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #ffb8e0;">라이더별 정산금액 (H)<br><small>C-D-((2)+(4)+(6)+(8))</small></td>
+          <td colspan="4"><input type="text" name="riderFinalPaymentH" class="form-control"></td>
+        </tr>
+
+        <!-- 3. 기본 공제 항목 그룹 -->
+        <tr class="table-secondary">
+          <th colspan="4" class="text-center">기본 공제 항목</th>
+        </tr>
+        <tr>
+          <td style="background-color: #ff5c7d;">소득세</td>
+          <td><input type="text" name="incomeTax" class="form-control"></td>
+          <td style="background-color: #ff5c7d;">주민세</td>
+          <td><input type="text" name="residentTax" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #ff5c7d;">원천 징수 세액<br><small>(소득세 + 주민세)</small></td>
+          <td colspan="3"><input type="text" name="withholdingTax" class="form-control"></td>
+        </tr>
+
+        <!-- 4. 세트 달성 여부에 따른 공제 항목 그룹 -->
+        <tr class="table-secondary">
+          <th colspan="4" class="text-center">세트 달성 여부에 따른 공제 항목<br><small>(세트 성공시 면제)</small></th>
+        </tr>
+        <tr>
+          <td style="background-color: #e5beff;">세트 달성 여부</td>
+          <td><input type="text" name="setAchievement" class="form-control"></td>
+          <td style="background-color: #e5beff;">(2) 세무기장료</td>
+          <td><input type="text" name="taxFee" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #e5beff;">(3) 사업주 부담 고용/산재 보험료</td>
+          <td colspan="3"><input type="text" name="ownerInsuranceFee" class="form-control"></td>
+        </tr>
+
+        <!-- 5. KAD 소속 라이더 지원 프로그램 그룹 -->
+        <tr class="table-secondary">
+          <th colspan="4" class="text-center">KAD 소속 라이더 지원 프로그램</th>
+        </tr>
+        <tr>
+          <td style="background-color: #f3ffc1;">프모 단가</td>
+          <td><input type="text" name="promoRate" class="form-control"></td>
+          <td style="background-color: #f3ffc1;">프모 수행 건수</td>
+          <td><input type="text" name="promotaskCount" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #f3ffc1;">최종 프로모션 지급 비용</td>
+          <td><input type="text" name="finalPromoPayment" class="form-control"></td>
+          <td style="background-color: #f3ffc1;">라이더 유류비 지원<br><small>(세트 성공시 기여도에 따라 지급)</small></td>
+          <td colspan="3"><input type="text" name="fuelSupport" class="form-control"></td>
+        </tr>
+
+        <!-- 6. 최종 지급 내역 그룹 -->
+        <tr class="table-secondary">
+          <th colspan="4" class="text-center">최종 지급 내역</th>
+        </tr>
+        <tr>
+          <td style="background-color: #c0c0c0;">[A] 지급액</td>
+          <td colspan="3"><input type="text" name="paymentA" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #c0c0c0;">[B] 사업자부담 환급 총액</td>
+          <td colspan="3"><input type="text" name="refundB" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #c0c0c0;">[C] 소속 라이더 지원 프로그램</td>
+          <td colspan="3"><input type="text" name="supportC" class="form-control"></td>
+        </tr>
+        <tr>
+          <td style="background-color: #c0c0c0;">최종 지급액 ([A]+[B]+[C])</td>
+          <td colspan="3"><input type="text" name="finalPayment" class="form-control"></td>
+        </tr>
+        <!-- 정산 시작일 / 종료일 -->
+    <table class="table table-bordered">
+      <tr>
+        <td colspan="2" class="text-center">정산 시작일</td>
+        <td><input type="text" name="settlementStart" class="form-control" required></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="text-center">정산 종료일</td>
+        <td><input type="text" name="settlementEnd" class="form-control" required></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="text-center">정산 지급일</td>
+        <td><input type="date" name="payDay" min="2025-01-01" max="2099-12-31" name="payDay" class="form-control" required></td>
+      </tr>
+    </table>
+    <div class="text-center mt-2">
+      <small class="text-muted">※ 지급은 해당일 오후 12~3시 사이 일괄 지급됩니다.</small>
+    </div>
+   
+      </table>
+    </div>
+
+
+    
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-primary w-100">등록 완료</button>
+    </div>
+
+    <div class="text-center mt-3">
+      <a href="/my-posts" class="btn btn-secondary">내 게시판으로 이동</a>
+    </div>
+  </form>
+  
+</div>
+
+<script>
+  let cachedUserData = {};
+
+  document.getElementById('searchNameBtn').addEventListener('click', async function () {
+    const name = document.getElementById('name').value.trim();
+    if (!name) return alert('이름을 입력하세요.');
+
+    try {
+      const resExcel = await fetch('/excel-data');
+      const excelData = await resExcel.json();
+
+      const resUser = await fetch(`/find-user?name=${encodeURIComponent(name)}`);
+      const userData = await resUser.json();
+      if (!userData || !userData.username) return alert('등록된 회원 이름이 아닙니다.');
+      cachedUserData = userData;
+      
+
+      fillUserData(userData);
+      fillExcelData(excelData, name);
+      performFinancialCalculations();
+      setTimeout(formatCurrencyFields, 300);
+
+    } catch (err) {
+      console.error(err);
+      alert('서버 오류가 발생했습니다.');
+    }
+  });
+
+  function fillUserData(user) {
+    const now = new Date();
+    const D = d => d.toString().padStart(2, '0');
+    const hour = now.getHours(), ampm = hour < 12 ? '오전' : '오후', hour12 = hour % 12 || 12;
+    const minutes = D(now.getMinutes());
+
+    document.getElementById('username').value = user.username;
+    document.getElementById('branch').value = user.branch;
+    document.getElementById('title').value = `정산서 ${now.getFullYear()}.${D(now.getMonth()+1)}.${D(now.getDate())} ${ampm} ${hour12}:${minutes}`;
+    document.querySelector('input[name="riderName"]').value = user.name;
+
+    // 자동 계좌 정보 채우기
+    document.querySelector('input[name="bankName"]').value = user.bankName || '';
+    document.querySelector('input[name="accountNumber"]').value = user.accountNumber || '';
+    document.querySelector('input[name="depositAccount"]').value = user.depositAccount || '';
+    document.querySelector('input[name="residentId"]').value = user.registerNumber  || '';
+  }
+
+  function fillExcelData(excelData, name) {
+    const rows = excelData.sheets?.["을지_협력사 소속 라이더 정산 확인용"];
+    const mapping = {
+      taskCount: 3, deliveryFeeA: 4, additionalPaymentB: 5, totalDeliveryFeeC: 6,
+      insuranceFee: 7, necessaryExpense: 8, paymentAmount: 9,
+      riderEmploymentInsurance: 11, riderIndustrialInsurance: 13,
+      riderRetroEmployment: 16, riderRetroIndustrial: 19, riderFinalPaymentH: 21,
+      incomeTax: 22, residentTax: 23, withholdingTax: 24
+    };
+    const signs = {
+      riderEmploymentInsurance: '', riderIndustrialInsurance: '',
+      riderRetroEmployment: '', riderRetroIndustrial: '',
+      insuranceFee: '', incomeTax: '', residentTax: '', withholdingTax: '',
+    };
+
+    let found = false;
+    for (let row of rows || []) {
+      if (row.includes(name)) {
+        found = true;
+        for (const [field, idx] of Object.entries(mapping)) {
+          const input = document.querySelector(`input[name="${field}"]`);
+          if (!input) continue;
+          let val = row[idx] || '';
+          if (signs[field] && val !== '') val = signs[field] + Math.abs(parseFloat(val));
+          input.value = val;
+          input.readOnly = true;
+        }
+        break;
+      }
+    }
+
+    if (!found) alert(`❌ '${name}'을 엑셀에서 찾을 수 없습니다.`);
+
+    // 관리비 조건
+    const manage = excelData.sheets?.["관리비"]?.[5];
+    if (manage) {
+      const score = parseFloat(manage[2]) || 0;
+      const set = document.querySelector('input[name="setAchievement"]');
+      const taxFee = document.querySelector('input[name="taxFee"]');
+      const ownerFee = document.querySelector('input[name="ownerInsuranceFee"]');
+      const emp = parseFloat(document.querySelector('input[name="riderEmploymentInsurance"]').value.replace('-', '')) || 0;
+      const ind = parseFloat(document.querySelector('input[name="riderIndustrialInsurance"]').value.replace('-', '')) || 0;
+
+      if (score >= 80) {
+        set.value = "성공"; set.style.color = "blue";
+        taxFee.value = "0"; ownerFee.value = "0";
+      } else {
+        set.value = "실패"; set.style.color = "red";
+        taxFee.value = cachedUserData.branch === "칠곡" ? "1500" : "0";
+        ownerFee.value = '' + (emp + ind);
+      }
+    }
+
+    // 정산일자 자동입력
+    const dates = excelData.sheets?.["갑지_협력사 전체 정산 확인용"]?.[15];
+    if (dates?.length >= 2) {
+      document.querySelector('input[name="settlementStart"]').value = dates[0];
+      document.querySelector('input[name="settlementEnd"]').value = dates[1];
+    }
+  }
+
+  function performFinancialCalculations() {
+    const get = name => {
+      const val = document.querySelector(`input[name="${name}"]`)?.value.replace(/[^\d\-\.]/g, '') || '0';
+      const parsed = parseFloat(val);
+      return Object.is(parsed, -0) ? 0 : parsed;
+    };
+  
+    const round = n => Math.round(n);
+  
+    const H = get('riderFinalPaymentH');
+    const taxFee = get('taxFee');
+    const ownerFee = get('ownerInsuranceFee');
+    const promoRate = get('promoRate');
+    const promoCount = get('promotaskCount');
+    const fuel = get('fuelSupport');
+  
+    const A = H - taxFee - Math.abs(ownerFee);
+    const finalPromo = promoRate * promoCount;
+    const B = finalPromo + fuel;
+    const C = B;
+    const total = A + B + C;
+  
+    document.querySelector('input[name="paymentA"]').value = round(A);
+    document.querySelector('input[name="finalPromoPayment"]').value = round(finalPromo);
+    document.querySelector('input[name="refundB"]').value = round(B);
+    document.querySelector('input[name="supportC"]').value = round(C);
+    document.querySelector('input[name="finalPayment"]').value = round(total);
+  }
+  
+  function formatCurrencyFields() {
+    const negatives = [
+      'riderEmploymentInsurance', 'riderIndustrialInsurance',
+      'insuranceFee', 'incomeTax', 'residentTax', 'withholdingTax',
+      'taxFee', 'ownerInsuranceFee'
+    ];
+  
+    const positives = [
+      'deliveryFeeA', 'additionalPaymentB', 'totalDeliveryFeeC',
+      'necessaryExpense', 'paymentAmount',
+      'riderRetroEmployment', 'riderRetroIndustrial'
+    ];
+  
+    const generals = [
+      'riderFinalPaymentH', 'promoRate', 'promotaskCount',
+      'finalPromoPayment', 'fuelSupport',
+      'paymentA', 'refundB', 'supportC', 'finalPayment'
+    ];
+  
+    const all = [...negatives, ...positives, ...generals];
+  
+    all.forEach(name => {
+      const input = document.querySelector(`input[name="${name}"]`);
+      if (!input) return;
+  
+      let rawValue = input.value.replace(/[^\d\-\.]/g, '');
+      let number = parseFloat(rawValue);
+  
+      // -0 처리
+      if (Object.is(number, -0)) number = 0;
+      if (isNaN(number)) {
+        input.value = '0원';
+        return;
+      }
+  
+      const formatted = number.toLocaleString('ko-KR') + '원';
+      input.value = negatives.includes(name) && number !== 0 ? '-' + formatted : formatted;
+    });
+  }
+  
+    const registerInput = document.getElementById('registerNumber');
+    registerInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/[^0-9]/g, '');
+
+      if (value.length > 13) {
+        value = value.slice(0, 13); // 최대 13자리로 제한
+      }
+
+      if (value.length > 6) {
+        value = value.slice(0, 6) + '-' + value.slice(6);
+      }
+
+      e.target.value = value;
+    });
+</script>
+    

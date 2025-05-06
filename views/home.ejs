@@ -1,0 +1,42 @@
+<% layout('layout') %>
+
+<div class="container mt-5 text-center">
+
+  <!-- 로고 -->
+  <div class="mb-4">
+    <img src="/images/logo.png" alt="로고" style="height: 40px;">
+  </div>
+
+  <!-- 인사말 -->
+  <% if (user.username === 'krogy' || user.username === 'admin') { %>
+    <h2>지사장님 반갑습니다!</h2>
+  <% } else { %>
+    <h2>환영합니다, <%= user.name %>님!</h2>
+    <p>가입 지사: <%= user.branch %></p>
+  <% } %>
+
+  <!-- 파일 업로드 (krogy, admin 전용) -->
+  <% if (user.username === 'krogy' || user.username === 'admin') { %>
+    <div class="mt-4">
+      <form id="uploadForm" action="/upload-welcome-image" method="POST" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="welcomeImage" class="form-control mb-2" accept="image/*" required>
+        <button type="submit" class="btn btn-success w-100">파일 업로드</button>
+      </form>
+    </div>
+  <% } %>
+
+  <!-- 업로드된 이미지 미리보기 (모든 유저에게 보여줌) -->
+  <% if (uploadedImagePath) { %>
+    <div class="mt-4">
+      <h5>공지 사항</h5>
+      <img src="<%= uploadedImagePath %>" alt="업로드된 이미지" class="img-fluid mt-2">
+    </div>
+  <% } %>
+
+  <!-- 이동 버튼 -->
+  <div class="mt-4">
+    <!--<a href="/my-posts" class="btn btn-primary">게시판 이동</a>-->
+    <a href="/logout" class="btn btn-secondary ms-2">로그아웃</a>
+  </div>
+
+</div>

@@ -1,0 +1,107 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4">엑셀 파일 업로드</h2>
+
+  <form id="uploadForm" action="/upload-excel" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xlsx" class="form-control mb-3" required>
+    <button type="submit" class="btn btn-primary w-100">업로드</button>
+  </form>
+
+  <div id="tabs" class="mt-5"></div>
+  <div id="tables" class="excel-wrapper mt-3"></div> <!-- 가로 스크롤 div -->
+
+</div>
+
+<style>
+    .excel-wrapper {
+      overflow-x: auto;
+      width: 100%;
+    }
+    table {
+      width: max-content; /* 테이블이 내용에 따라 길어지게 */
+      table-layout: auto; /* 고정하지 않음 */
+      border-collapse: collapse;
+      font-size: 14px;
+      white-space: nowrap; /* 줄바꿈 금지 */
+    }
+    th, td {
+      min-width: 150px; /* 셀 최소 너비 넉넉히 확보 */
+      padding: 8px;
+      text-align: center;
+      vertical-align: middle;
+      border: 1px solid #ddd;
+    }
+  </style>
+  
+
+<script>
+  let excelFullData = {};
+  let passwordProtectedFields = ["비밀번호", "Password"];
+
+  async function loadExcelData() {
+    const res = await fetch('/excel-data');
+    const data = await res.json();
+
+    const tabsDiv = document.getElementById('tabs');
+    const tablesDiv = document.getElementById('tables');
+
+    if (!data.sheets) return;
+
+    excelFullData = data;
+
+    tabsDiv.innerHTML = data.sheetNames.map(sheet => `
+      <button onclick="showSheet('${sheet}')" class="btn btn-outline-primary btn-tab">${sheet}</button>
+    `).join('');
+
+    tablesDiv.innerHTML = data.sheetNames.map(sheet => {
+      const rows = data.sheets[sheet];
+      if (!rows.length) return `<div id="${sheet}" style="display:none;"><p>데이터 없음</p></div>`;
+
+      const table = `
+        <div id="${sheet}" style="display:none;">
+          <table class="table table-bordered">
+            <tbody>
+              ${rows.map((row, rowIndex) => `
+                <tr>
+                  ${row.map((cell, cellIndex) => {
+                    if (passwordProtectedFields.includes(rows[0][cellIndex])) {
+                      return `<td>
+                        <span id="masked-${sheet}-${rowIndex}-${cellIndex}">******</span>
+                        <button onclick="promptPassword('${sheet}', ${rowIndex}, ${cellIndex})" class="btn btn-sm btn-warning ms-2">보기</button>
+                      </td>`;
+                    } else {
+                      return `<td>${cell || ''}</td>`;
+                    }
+                  }).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      return table;
+    }).join('');
+
+    showSheet(data.sheetNames[0]);
+  }
+
+  function showSheet(sheetId) {
+    document.querySelectorAll('#tables > div').forEach(div => div.style.display = 'none');
+    document.getElementById(sheetId).style.display = 'block';
+  }
+
+  function promptPassword(sheet, rowIndex, cellIndex) {
+    const inputPassword = prompt("비밀번호를 입력하세요:");
+    const realPassword = excelFullData.sheets[sheet][rowIndex][cellIndex];
+
+    if (inputPassword === realPassword) {
+      const targetId = `masked-${sheet}-${rowIndex}-${cellIndex}`;
+      document.getElementById(targetId).innerText = realPassword;
+    } else {
+      alert("비밀번호가 틀렸습니다!");
+    }
+  }
+
+  window.onload = loadExcelData;
+</script>

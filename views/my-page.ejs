@@ -1,0 +1,93 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">내 정보 관리</h2>
+
+  <form id="userInfoForm" action="/update-my-info" method="POST">
+
+    <!-- 기본 정보 그룹 -->
+    <div class="card mb-4">
+      <div class="card-header bg-light fw-bold">기본 정보</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <tbody>
+            <tr>
+              <th>아이디</th>
+              <td><%= user.username %></td>
+            </tr>
+            <tr>
+              <th>이름</th>
+              <td><%= user.name %></td>
+            </tr>
+            <tr>
+              <th>전화번호</th>
+              <td><input type="text" name="phone" class="form-control" value="<%= user.phone %>"></td>
+            </tr>
+            <tr>
+              <th>주민등록번호</th>
+              <td><input type="text" name="registerNumber" class="form-control" value="<%= user.registerNumber || '' %>"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 계좌 정보 그룹 -->
+    <div class="card mb-4">
+      <div class="card-header bg-light fw-bold">계좌 정보</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <tbody>
+            <tr>
+              <th>은행명</th>
+              <td><input type="text" name="bankName" class="form-control" value="<%= user.bankName || '' %>"></td>
+            </tr>
+            <tr>
+              <th>계좌번호</th>
+              <td><input type="text" name="accountNumber" class="form-control" value="<%= user.accountNumber || '' %>"></td>
+            </tr>
+            <tr>
+              <th>예금주</th>
+              <td><input type="text" name="depositAccount" class="form-control" value="<%= user.depositAccount || '' %>"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 버튼 -->
+    <div class="mt-4 d-flex justify-content-center gap-2">
+      <button type="submit" class="btn btn-primary">저장</button>
+      <button type="button" id="backBtn" class="btn btn-secondary">돌아가기</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  let formChanged = false;
+
+  document.querySelectorAll('#userInfoForm input').forEach(input => {
+    input.addEventListener('input', () => {
+      formChanged = true;
+    });
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (formChanged) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  document.getElementById('backBtn').addEventListener('click', function () {
+    if (formChanged) {
+      if (confirm("변경된 내용을 저장하시겠습니까?")) {
+        document.getElementById('userInfoForm').submit();
+      } else {
+        window.location.href = '/';
+      }
+    } else {
+      window.location.href = '/';
+    }
+  });
+</script>
