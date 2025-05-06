@@ -445,8 +445,8 @@ app.post('/post/:id/delete', 로그인필요, async (req, res) => {
       return res.status(404).send('게시글을 찾을 수 없습니다.');
     }
 
-    // krogy이거나, 게시글 작성자가 admin일 경우만 삭제 허용
-    if (user.username === 'krogy' || post.author === 'admin') {
+    // krogy, admin 계정이거나 본인 글일 경우 삭제 허용
+    if (user.username === 'krogy' || user.username === 'admin' ) { //|| post.author === user.username
       await db.collection('posts').deleteOne({ _id: new ObjectId(postId) });
       return res.redirect('/my-posts');
     } else {
