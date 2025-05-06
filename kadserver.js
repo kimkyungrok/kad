@@ -571,11 +571,9 @@ const storage = multer.diskStorage({
     cb(null, 'public/uploads/'); // 저장 폴더
   },
   filename: (req, file, cb) => {
-    const koreanTime = new Date().toLocaleString('ko-KR', {
-      timeZone: 'Asia/Seoul',
-    }).replace(/[\s:]/g, '_'); // 예: 2025_05_07_23_45_21
+    const koreanTime = dayjs().tz("Asia/Seoul").format('YYYY-MM-DD_HH-mm-ss');
     const filename = 'welcome-' + koreanTime + path.extname(file.originalname);
-    cb(null,filename); 
+    cb(null, filename);
   }
 });
 
