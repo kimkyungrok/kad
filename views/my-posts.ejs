@@ -2,43 +2,44 @@
 
 <div class="container mt-5">
 
-  <!-- 회원 정보 (테이블 형태) -->
+  <!-- 회원 정보 -->
   <div class="card mb-4">
     <div class="card-body">
       <h5 class="card-title">회원 정보</h5>
-      <table class="table table-bordered table-sm">
-        <tbody>
-          <tr>
-            <th colspan="1">이름</th>
-            <td colspan="2"><%= user.name %></td>
-            <th colspan="1">등록 아이디</th>
-            <td colspan="2"><%= user.username %></td>
-          </tr>
-          <tr>
-            <th colspan="1">배민커넥트 아이디</th>
-            <td colspan="2"><%= user.connectId %></td>
-            <th colspan="1">전화번호</th>
-            <td colspan="2"><%= user.phone %></td>
-          </tr>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm text-nowrap">
+          <tbody>
             <tr>
-              <th colspan="1">가입 지사</th>
-              <td colspan="4"><%= user.branch %></td>
+              <th>이름</th>
+              <td><%= user.name %></td>
+              <th>등록 아이디</th>
+              <td><%= user.username %></td>
             </tr>
-      <table class="table table-bordered table-sm">
-        <tbody>
-          <tr>
-            <th colspan="1">은행명</th>
-            <td colspan="1"><%= user.bankName %></td>
-            <th colspan="1">계좌번호</th>
-            <td colspan="1"><%= user.accountNumber %></td>
-            <th colspan="1">예금주</th>
-            <td colspan="1"><%= user.depositAccount %></td>
-          </tr>
-        </tbody>
-
-
-        </tbody>
-      </table>
+            <tr>
+              <th>배민커넥트 아이디</th>
+              <td><%= user.connectId %></td>
+              <th>전화번호</th>
+              <td><%= user.phone %></td>
+            </tr>
+            <tr>
+              <th>가입 지사</th>
+              <td colspan="3"><%= user.branch %></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table table-bordered table-sm text-nowrap mt-2">
+          <tbody>
+            <tr>
+              <th>은행명</th>
+              <td><%= user.bankName %></td>
+              <th>계좌번호</th>
+              <td><%= user.accountNumber %></td>
+              <th>예금주</th>
+              <td><%= user.depositAccount %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -78,56 +79,56 @@
   <h5 class="mb-4">정산서 목록 (<%= posts.length %>건)</h5>
 
   <form id="deleteForm" method="POST" action="/delete-posts">
-    <table class="table table-hover table-bordered align-middle text-center">
-      <thead class="table-light">
-        <tr>
-          <% if (['krogy', 'admin'].includes(user.username)) { %>
-            <th rowspan="2"><input type="checkbox" id="checkAll"></th>
-          <% } %>
-          <th colspan="1">정산 정보</th>
-          <th colspan="5">라이더 정보</th>
-        </tr>
-        <tr>
-          <th>제목</th>
-          <th>라이더명</th>
-          <th>지사</th>
-          <th>등록일</th>
-          <th>본인확인</th>
-          <th>상세보기</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% posts.forEach(post => { %>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle text-center text-nowrap">
+        <thead class="table-light">
           <tr>
             <% if (['krogy', 'admin'].includes(user.username)) { %>
-              <td><input type="checkbox" name="deleteIds" value="<%= post._id %>"></td>
+              <th rowspan="2"><input type="checkbox" id="checkAll"></th>
             <% } %>
-            <td><%= post.title %></td>
-            <td><%= post.riderName %></td>
-            <td><%= post.branch %></td>
-            <td><%= new Date(post.createdAt).toLocaleDateString('ko-KR') %></td>
-            <td>
-              <% if (post.confirmed === 'yes') { %>
-                <span class="text-primary fw-bold">O</span>
-              <% } else { %>
-                <span class="text-danger fw-bold">X</span>
-              <% } %>
-            </td><td>
-              <a href="/post/<%= post._id %>" class="btn btn-sm btn-outline-primary">보기</a>
-            </td>
+            <th>제목</th>
+            <th>라이더명</th>
+            <th>지사</th>
+            <th>등록일</th>
+            <th>본인확인</th>
+            <th>상세보기</th>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% posts.forEach(post => { %>
+            <tr>
+              <% if (['krogy', 'admin'].includes(user.username)) { %>
+                <td><input type="checkbox" name="deleteIds" value="<%= post._id %>"></td>
+              <% } %>
+              <td><%= post.title %></td>
+              <td><%= post.riderName %></td>
+              <td><%= post.branch %></td>
+              <td><%= new Date(post.createdAt).toLocaleDateString('ko-KR') %></td>
+              <td>
+                <% if (post.confirmed === 'yes') { %>
+                  <span class="text-primary fw-bold">O</span>
+                <% } else { %>
+                  <span class="text-danger fw-bold">X</span>
+                <% } %>
+              </td>
+              <td>
+                <a href="/post/<%= post._id %>" class="btn btn-sm btn-outline-primary">보기</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
 
     <% if (['krogy', 'admin'].includes(user.username)) { %>
-    <div class="mt-4 d-flex justify-content-center">
-      <button type="submit" class="btn btn-danger" onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
-    </div>
+      <div class="mt-4 d-flex justify-content-center">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
+      </div>
     <% } %>
   </form>
 
-  <div class="mt-4 d-flex justify-content-center gap-2">
+  <!-- 하단 버튼 -->
+  <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-center">
     <a href="/" class="btn btn-secondary">홈으로</a>
     <% if (['krogy', 'admin'].includes(user.username)) { %>
       <a href="/write" class="btn btn-primary">정산서 등록</a>
@@ -136,7 +137,7 @@
 </div>
 
 <script>
-  // 전체 선택 기능 (관리자 전용)
+  // 전체 선택
   document.getElementById('checkAll')?.addEventListener('change', function () {
     const checkboxes = document.querySelectorAll('input[name="deleteIds"]');
     checkboxes.forEach(cb => cb.checked = this.checked);

@@ -1,39 +1,54 @@
 <% layout('layout') %>
 
 <div class="container mt-5">
-  <h2 class="mb-4">엑셀 파일 업로드</h2>
+  <h2 class="mb-4 text-center">엑셀 파일 업로드</h2>
 
-  <form id="uploadForm" action="/upload-excel" method="POST" enctype="multipart/form-data">
+  <!-- 업로드 폼 -->
+  <form id="uploadForm" action="/upload-excel" method="POST" enctype="multipart/form-data" class="mb-4">
     <input type="file" name="file" accept=".xlsx" class="form-control mb-3" required>
     <button type="submit" class="btn btn-primary w-100">업로드</button>
   </form>
 
-  <div id="tabs" class="mt-5"></div>
-  <div id="tables" class="excel-wrapper mt-3"></div> <!-- 가로 스크롤 div -->
+  <!-- 시트 탭 버튼 -->
+  <div id="tabs" class="mb-3 d-flex flex-wrap gap-2 overflow-auto"></div>
 
+  <!-- 테이블 표시 영역 -->
+  <div id="tables" class="excel-wrapper"></div>
 </div>
 
 <style>
-    .excel-wrapper {
-      overflow-x: auto;
-      width: 100%;
-    }
-    table {
-      width: max-content; /* 테이블이 내용에 따라 길어지게 */
-      table-layout: auto; /* 고정하지 않음 */
-      border-collapse: collapse;
-      font-size: 14px;
-      white-space: nowrap; /* 줄바꿈 금지 */
+  .excel-wrapper {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  table {
+    width: max-content;
+    table-layout: auto;
+    border-collapse: collapse;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  th, td {
+    min-width: 150px;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #ddd;
+  }
+
+  /* 모바일 화면 최적화 */
+  @media (max-width: 576px) {
+    h2 {
+      font-size: 1.4rem;
     }
     th, td {
-      min-width: 150px; /* 셀 최소 너비 넉넉히 확보 */
-      padding: 8px;
-      text-align: center;
-      vertical-align: middle;
-      border: 1px solid #ddd;
+      min-width: 100px;
+      font-size: 12px;
     }
-  </style>
-  
+  }
+</style>
 
 <script>
   let excelFullData = {};
@@ -68,7 +83,7 @@
                     if (passwordProtectedFields.includes(rows[0][cellIndex])) {
                       return `<td>
                         <span id="masked-${sheet}-${rowIndex}-${cellIndex}">******</span>
-                        <button onclick="promptPassword('${sheet}', ${rowIndex}, ${cellIndex})" class="btn btn-sm btn-warning ms-2">보기</button>
+                        <button onclick="promptPassword('${sheet}', ${rowIndex}, ${cellIndex})" class="btn btn-sm btn-warning mt-1">보기</button>
                       </td>`;
                     } else {
                       return `<td>${cell || ''}</td>`;

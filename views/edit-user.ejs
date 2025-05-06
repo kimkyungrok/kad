@@ -1,7 +1,7 @@
 <% layout('layout') %>
 
-<div class="container mt-5">
-  <h2 class="mb-4">가입자 정보 수정</h2>
+<div class="container mt-5" style="max-width: 600px;">
+  <h2 class="mb-4 text-center">가입자 정보 수정</h2>
 
   <form action="/edit-user/<%= user._id %>" method="POST">
     <div class="mb-3">
@@ -54,58 +54,69 @@
       <input type="text" class="form-control" id="depositAccount" name="depositAccount" value="<%= user.depositAccount || '' %>">
     </div>
 
-    <div class="mb-3">
+    <div class="mb-4">
       <label for="registerNumber" class="form-label">주민등록번호</label>
       <input type="text" class="form-control" id="registerNumber" name="registerNumber" value="<%= user.registerNumber || '' %>">
     </div>
 
-    <button type="submit" class="btn btn-primary">수정 완료</button>
-    <a href="/user-list" class="btn btn-secondary ms-2">목록으로</a>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="submit" class="btn btn-primary">수정 완료</button>
+      <a href="/user-list" class="btn btn-secondary ms-md-2">목록으로</a>
+    </div>
   </form>
 </div>
 
+<style>
+  @media (max-width: 576px) {
+    label, input, select {
+      font-size: 14px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+    }
+  }
+</style>
+
 <script>
-// 전화번호 자동 포맷
-const phoneInput = document.getElementById('phone');
-phoneInput.addEventListener('input', function(e) {
-  let numbers = e.target.value.replace(/[^0-9]/g, '');
-  if (e.inputType !== 'deleteContentBackward' && e.target.value.match(/[^0-9\-]/g)) {
-    alert('전화번호는 숫자만 입력 가능합니다.');
-  }
-  if (numbers.length > 3 && numbers.length <= 7) {
-    e.target.value = numbers.replace(/(\d{3})(\d{1,4})/, '$1-$2');
-  } else if (numbers.length > 7) {
-    e.target.value = numbers.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
-  } else {
-    e.target.value = numbers;
-  }
-});
+  // 전화번호 자동 포맷
+  const phoneInput = document.getElementById('phone');
+  phoneInput.addEventListener('input', function (e) {
+    let numbers = e.target.value.replace(/[^0-9]/g, '');
+    if (e.inputType !== 'deleteContentBackward' && e.target.value.match(/[^0-9\-]/g)) {
+      alert('전화번호는 숫자만 입력 가능합니다.');
+    }
+    if (numbers.length > 3 && numbers.length <= 7) {
+      e.target.value = numbers.replace(/(\d{3})(\d{1,4})/, '$1-$2');
+    } else if (numbers.length > 7) {
+      e.target.value = numbers.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
+    } else {
+      e.target.value = numbers;
+    }
+  });
 
-// 생년월일 자동 포맷
-const birthdateInput = document.getElementById('birthdate');
+  // 생년월일 자동 포맷
+  const birthdateInput = document.getElementById('birthdate');
+  birthdateInput.addEventListener('input', function (e) {
+    let numbers = e.target.value.replace(/[^0-9]/g, '');
+    if (e.inputType !== 'deleteContentBackward' && e.target.value.match(/[^0-9.]/g)) {
+      alert('생년월일은 숫자만 입력해야 합니다.');
+      numbers = numbers.replace(/[^0-9]/g, '');
+    }
 
-birthdateInput.addEventListener('input', function(e) {
-  let numbers = e.target.value.replace(/[^0-9]/g, '');
+    if (numbers.length > 8) {
+      numbers = numbers.substring(0, 8);
+    }
 
-  if (e.inputType !== 'deleteContentBackward' && e.target.value.match(/[^0-9.]/g)) {
-    alert('생년월일은 숫자만 입력해야 합니다.');
-    numbers = numbers.replace(/[^0-9]/g, '');
-  }
+    let formatted = '';
+    if (numbers.length <= 4) {
+      formatted = numbers;
+    } else if (numbers.length <= 6) {
+      formatted = numbers.slice(0, 4) + '.' + numbers.slice(4);
+    } else {
+      formatted = numbers.slice(0, 4) + '.' + numbers.slice(4, 6) + '.' + numbers.slice(6, 8);
+    }
 
-  if (numbers.length > 8) {
-    numbers = numbers.substring(0, 8);
-  }
-
-  let formatted = '';
-
-  if (numbers.length <= 4) {
-    formatted = numbers;
-  } else if (numbers.length <= 6) {
-    formatted = numbers.slice(0, 4) + '.' + numbers.slice(4);
-  } else {
-    formatted = numbers.slice(0, 4) + '.' + numbers.slice(4, 6) + '.' + numbers.slice(6, 8);
-  }
-
-  birthdateInput.value = formatted;
-});
+    birthdateInput.value = formatted;
+  });
 </script>

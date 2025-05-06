@@ -1,11 +1,27 @@
 <% layout('layout') %>
 
-<div class="container mt-5 text-center">
-  <h3 class="mb-4">정말 탈퇴하시겠습니까?</h3>
-  <p class="text-danger mb-4">이 작업은 되돌릴 수 없습니다.</p>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+      <h3 class="mb-4">정말 탈퇴하시겠습니까?</h3>
+      <p class="text-danger mb-4">이 작업은 되돌릴 수 없습니다.</p>
 
-  <form action="/delete-account" method="POST">
-    <button type="submit" class="btn btn-danger">회원 탈퇴</button>
-    <a href="/" class="btn btn-secondary">취소</a>
-  </form>
+      <form action="/delete-account" method="POST" class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <button type="submit" class="btn btn-danger px-4">회원 탈퇴</button>
+        <a href="/" class="btn btn-secondary px-4">취소</a>
+      </form>
+    </div>
+  </div>
 </div>
+
+<style>
+  @media (max-width: 576px) {
+    h3 {
+      font-size: 1.4rem;
+    }
+    .btn {
+      font-size: 14px;
+      padding: 8px 16px;
+    }
+  }
+</style>
