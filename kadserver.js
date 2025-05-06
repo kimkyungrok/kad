@@ -331,7 +331,7 @@ app.post('/write', async (req, res) => {
       setAchievement, taxFee, ownerInsuranceFee,
       promoRate, promotaskCount, finalPromoPayment, fuelSupport,
       paymentA, refundB, supportC, finalPayment,
-      settlementStart, settlementEnd, payDay
+      settlementStart, settlementEnd, payDay ,statementPaper
     } = req.body;
 
     // 제목 자동 생성
@@ -339,7 +339,7 @@ app.post('/write', async (req, res) => {
     const D = d => d.toString().padStart(2, '0');
     const hour = now.getHours(), ampm = hour < 12 ? '오전' : '오후', hour12 = hour % 12 || 12;
     const minutes = D(now.getMinutes());
-    const generatedTitle = `정산서 ${now.getFullYear()}.${D(now.getMonth()+1)}.${D(now.getDate())} ${ampm} ${hour12}:${minutes}`;
+    const generatedTitle = statementPaper;
 
     const newPost = {
       title: generatedTitle,

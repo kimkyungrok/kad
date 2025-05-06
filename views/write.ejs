@@ -199,6 +199,10 @@
         <td colspan="2" class="text-center">정산 지급일</td>
         <td><input type="date" name="payDay" min="2025-01-01" max="2099-12-31" name="payDay" class="form-control" required></td>
       </tr>
+      <tr>
+        <td colspan="2" class="text-center">정산서 작성일</td>
+        <td><input type="text" name="statementPaper" class="form-control" required></td>
+      </tr>
     </table>
     <div class="text-center mt-2">
       <small class="text-muted">※ 지급은 해당일 오후 12~3시 사이 일괄 지급됩니다.</small>
@@ -258,6 +262,7 @@
     document.getElementById('branch').value = user.branch;
     document.getElementById('title').value = `정산서 ${now.getFullYear()}.${D(now.getMonth()+1)}.${D(now.getDate())} ${ampm} ${hour12}:${minutes}`;
     document.querySelector('input[name="riderName"]').value = user.name;
+    document.querySelector('input[name="statementPaper"]').value = `${now.getFullYear()}.${D(now.getMonth()+1)}.${D(now.getDate())} ${ampm} ${hour12}:${minutes}`;
 
     // 자동 계좌 정보 채우기
     document.querySelector('input[name="bankName"]').value = user.bankName || '';
