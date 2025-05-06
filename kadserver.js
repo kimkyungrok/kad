@@ -12,6 +12,7 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const port = process.env.PORT || 3000;
 
+app.use('/uploads', express.static('public/uploads'));
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
@@ -569,8 +570,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/uploads/'); // 저장 폴더
   },
-  filename: (req, file, cb) => {
-    cb(null, 'welcome-' + Date.now() + path.extname(file.originalname)); // 파일명: welcome-시간.jpg
+  filename: (req, file, cb) => {cb(null, 'welcome-' + Date.now() + path.extname(file.originalname)); // 파일명: welcome-시간.jpg
   }
 });
 
