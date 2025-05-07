@@ -11,7 +11,7 @@ const XLSX = require('xlsx');
 const upload = multer({ dest: 'public/uploads/' });
 const fs = require('fs');
 const port = process.env.PORT || 3000;
-
+const uploadPath = 'public/uploads';
 
 app.use('/uploads', express.static('/public/uploads'));
 app.use(express.static(__dirname + '/public'));
@@ -26,6 +26,11 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
 
 global.excelFullData = null; // 🔥 전체 엑셀 데이터 저장용
 global.excelFileName = '';
@@ -51,7 +56,7 @@ new MongoClient(url)
   .catch(err => {
     console.error('DB 연결 에러:', err);
   });
-  
+ 
 
 // 로그인 필요 미들웨어
 function 로그인필요(req, res, next) {
