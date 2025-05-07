@@ -745,3 +745,8 @@ app.post('/update-my-info', 로그인필요, async (req, res) => {
   );
   res.redirect('/my-page');
 });
+
+app.get('/promoReg', async (req, res) => {
+  const users = await db.collection('users').find().toArray();
+  res.render('promoReg', { users });
+});
