@@ -478,9 +478,11 @@ app.post('/post/:id/confirm', 로그인필요, async (req, res) => {
 
 // 수정 폼 페이지
 app.get('/edit-user/:id', 로그인필요, async (req, res) => {
-  if (req.session.user.username !== 'krogy') {
+  const allowedUsers = ['krogy', 'admin'];
+  if (!allowedUsers.includes(req.session.user.username)) {
     return res.status(403).send('접근 권한이 없습니다.');
   }
+
   const user = await db.collection('users').findOne({ _id: new ObjectId(req.params.id) });
   res.render('edit-user', { title: '가입자 수정', user });
 });
@@ -493,7 +495,8 @@ app.post('/edit-user/:id', async (req, res) => {
   }
 
   // 관리자 계정만 수정 가능
-  if (req.session.user.username !== 'krogy') {
+  const allowedUsers = ['krogy', 'admin'];
+  if (!allowedUsers.includes(req.session.user.username)) {
     return res.status(403).send('접근 권한이 없습니다.');
   }
 

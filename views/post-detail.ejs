@@ -188,16 +188,5 @@
   </div>
 </div>
 
-
-  <div class="text-center mt-4">
-    <% if (user && (user.username === 'krogy' || user.username === 'admin')) { %>
-      <form action="/post/<%= post._id %>/delete" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-        <button type="submit" class="btn btn-danger">삭제하기</button>
-        <a href="/my-posts" class="btn btn-secondary ms-2 mt-2 mt-md-0">목록으로 돌아가기</a>
-      </form>
-    <% } else { %>
-      <a href="/my-posts" class="btn btn-secondary">목록으로 돌아가기</a>
-    <% } %>
-  </div>
 </div>
 </div>
