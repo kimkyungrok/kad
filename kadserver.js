@@ -95,8 +95,8 @@ app.get('/', 로그인필요, async (req, res) => {
 });
 
 // 회원가입 페이지
-app.get('/register', (req, res) => {
-  res.render('register', { title: '회원가입' });
+app.get('/Register', (req, res) => {
+  res.render('Register', { title: '회원가입' });
 });
 
 // 환영 페이지
