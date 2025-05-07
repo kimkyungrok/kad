@@ -4,59 +4,65 @@
   <h2 class="mb-4 text-center">가입자 정보 수정</h2>
 
   <form action="/edit-user/<%= user._id %>" method="POST">
-    <div class="mb-3">
-      <label for="username" class="form-label">아이디 (변경불가)</label>
-      <input type="text" class="form-control" id="username" value="<%= user.username %>" disabled>
+
+    <!-- 사용자 기본 정보 그룹 -->
+    <div class="border rounded p-3 mb-4">
+      <h5 class="mb-3">기본 정보</h5>
+      <div class="mb-3">
+        <label for="username" class="form-label">아이디 (변경불가)</label>
+        <input type="text" class="form-control" id="username" value="<%= user.username %>" disabled>
+      </div>
+      <div class="mb-3">
+        <label for="name" class="form-label">이름</label>
+        <input type="text" class="form-control" id="name" name="name" required value="<%= user.name %>">
+      </div>
+      <div class="mb-3">
+        <label for="connectId" class="form-label">배민커넥트 아이디</label>
+        <input type="text" class="form-control" id="connectId" name="connectId" required value="<%= user.connectId %>">
+      </div>
+      <div class="mb-3">
+        <label for="phone" class="form-label">전화번호</label>
+        <input type="text" class="form-control" id="phone" name="phone" required value="<%= user.phone %>">
+      </div>
+      <div class="mb-3">
+        <label for="birthdate" class="form-label">생년월일</label>
+        <input type="text" class="form-control" id="birthdate" name="birthdate" required value="<%= user.birthdate %>">
+      </div>
+      <div class="mb-3">
+        <label for="branch" class="form-label">가입 지사</label>
+        <select class="form-select" id="branch" name="branch" required>
+          <option value="">지사 선택</option>
+          <option value="경산" <%= user.branch === '경산' ? 'selected' : '' %>>경산</option>
+          <option value="시지" <%= user.branch === '시지' ? 'selected' : '' %>>시지</option>
+          <option value="칠곡" <%= user.branch === '칠곡' ? 'selected' : '' %>>칠곡</option>
+        </select>
+      </div>
     </div>
 
-    <div class="mb-3">
-      <label for="name" class="form-label">이름</label>
-      <input type="text" class="form-control" id="name" name="name" required value="<%= user.name %>">
+    <!-- 계좌 정보 그룹 -->
+    <div class="border rounded p-3 mb-4">
+      <h5 class="mb-3">계좌 정보</h5>
+      <div class="mb-3">
+        <label for="bankName" class="form-label">은행명</label>
+        <input type="text" class="form-control" id="bankName" name="bankName" value="<%= user.bankName || '' %>">
+      </div>
+      <div class="mb-3">
+        <label for="accountNumber" class="form-label">계좌번호</label>
+        <input type="text" class="form-control" id="accountNumber" name="accountNumber" value="<%= user.accountNumber || '' %>">
+      </div>
+      <div class="mb-3">
+        <label for="depositAccount" class="form-label">예금주</label>
+        <input type="text" class="form-control" id="depositAccount" name="depositAccount" value="<%= user.depositAccount || '' %>">
+      </div>
     </div>
 
-    <div class="mb-3">
-      <label for="connectId" class="form-label">배민커넥트 아이디</label>
-      <input type="text" class="form-control" id="connectId" name="connectId" required value="<%= user.connectId %>">
-    </div>
-
-    <div class="mb-3">
-      <label for="phone" class="form-label">전화번호</label>
-      <input type="text" class="form-control" id="phone" name="phone" required value="<%= user.phone %>">
-    </div>
-
-    <div class="mb-3">
-      <label for="birthdate" class="form-label">생년월일</label>
-      <input type="text" class="form-control" id="birthdate" name="birthdate" required value="<%= user.birthdate %>">
-    </div>
-
-    <div class="mb-3">
-      <label for="branch" class="form-label">가입 지사</label>
-      <select class="form-select" id="branch" name="branch" required>
-        <option value="">지사 선택</option>
-        <option value="경산" <%= user.branch === '경산' ? 'selected' : '' %>>경산</option>
-        <option value="시지" <%= user.branch === '시지' ? 'selected' : '' %>>시지</option>
-        <option value="칠곡" <%= user.branch === '칠곡' ? 'selected' : '' %>>칠곡</option>
-      </select>
-    </div>
-
-    <div class="mb-3">
-      <label for="bankName" class="form-label">은행명</label>
-      <input type="text" class="form-control" id="bankName" name="bankName" value="<%= user.bankName || '' %>">
-    </div>
-
-    <div class="mb-3">
-      <label for="accountNumber" class="form-label">계좌번호</label>
-      <input type="text" class="form-control" id="accountNumber" name="accountNumber" value="<%= user.accountNumber || '' %>">
-    </div>
-
-    <div class="mb-3">
-      <label for="depositAccount" class="form-label">예금주</label>
-      <input type="text" class="form-control" id="depositAccount" name="depositAccount" value="<%= user.depositAccount || '' %>">
-    </div>
-
-    <div class="mb-4">
-      <label for="registerNumber" class="form-label">주민등록번호</label>
-      <input type="text" class="form-control" id="registerNumber" name="registerNumber" value="<%= user.registerNumber || '' %>">
+    <!-- 신분 확인 그룹 -->
+    <div class="border rounded p-3 mb-4">
+      <h5 class="mb-3">신분 확인</h5>
+      <div class="mb-3">
+        <label for="registerNumber" class="form-label">주민등록번호</label>
+        <input type="text" class="form-control" id="registerNumber" name="registerNumber" value="<%= user.registerNumber || '' %>">
+      </div>
     </div>
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
