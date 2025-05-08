@@ -1,0 +1,108 @@
+<% layout('layout') %>
+
+<!-- 작성일 입력 -->
+<div class="container my-4">
+  <form id="checkForm" class="row g-2 align-items-center">
+    <div class="col-auto">
+      <label for="writtenDate" class="form-label">작성일:</label>
+    </div>
+    <div class="col-auto">
+      <input type="date" id="writtenDate" class="form-control" required>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">확인</button>
+    </div>
+  </form>
+</div>
+
+<!-- 정산 테이블 -->
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>이름</th>
+      <th>정산 금액</th>
+      <th>등수</th>
+      <th>지급액</th>
+    </tr>
+  </thead>
+  <tbody id="riderTableBody">
+    <% riderData.forEach((item, index) => { %>
+    <tr data-rank="<%= item.rank %>" data-name="<%= item.name %>">
+        <td><%= item.name %></td>
+        <td><%= item.value.toLocaleString() %></td>
+        <td><%= item.rank || '-' %></td>
+        <td class="payCell"></td> <!-- 이 칸에 지급액 자동 입력 -->
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- 지급액 자동 입력 스크립트 -->
+<script>
+    const promos = <%- JSON.stringify(promos || []) %>;
+  
+    document.getElementById('checkForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+  
+      const inputDate = document.getElementById('writtenDate').value;
+      if (!inputDate) return alert("작성일을 입력해주세요.");
+  
+      console.log('🟡 사용자 입력 날짜:', inputDate);
+      console.log('🟡 promos 배열:', promos);
+  
+      let matchedPromo = null;
+  
+      promos.forEach((promo, index) => {
+        const promoDate = new Date(promo.createdAt).toISOString().slice(0, 10);
+        const type = promo.type;
+  
+        console.log(`📄 [${index}] promoDate = ${promoDate}, type = ${type}`);
+        if (promoDate === inputDate && type === 'table') {
+          matchedPromo = promo;
+        }
+      });
+  
+      if (!matchedPromo) {
+        alert("해당 작성일의 표 형식 프로모션이 없습니다.");
+        return;
+      }
+  
+      alert(`✅ 프로모션 매칭됨:\n작성일: ${new Date(matchedPromo.createdAt).toISOString().slice(0, 10)}\n타입: ${matchedPromo.type}`);
+  
+      const promoTable = matchedPromo.content;
+      const rows = document.querySelectorAll('#riderTableBody tr');
+  
+      console.log('📋 프로모션 표 데이터:', promoTable);
+  
+      rows.forEach((row, i) => {
+        const rank = parseInt(row.getAttribute('data-rank'));
+        const rankLabel = `${rank}등`; // 예: "1등"
+        let amount = '';
+  
+        console.log(`🔍 Row ${i} 등수: ${rankLabel}`);
+  
+        if (rank >= 1 && rank <= 5) {
+          Object.values(promoTable).forEach((rowObj, idx) => {
+            const values = Object.values(rowObj);
+            const label = values[0]?.toString().trim();  // 등수 텍스트
+            const value = values[1];
+  
+            console.log(`  🔎 비교 ${idx}: label=${label}, value=${value}`);
+            if (label === rankLabel) {
+              amount = value;
+              console.log(`  ✅ 매칭됨: ${rankLabel} = ${value}`);
+            }
+          });
+  
+          const cell = row.querySelector('.payCell');
+          if (amount && cell) {
+            cell.innerText = amount;
+            console.log(`💰 지급액 입력 완료: ${amount}`);
+          } else {
+            console.warn(`⚠️ 지급액 없음 또는 셀 오류: Row ${i}, amount=${amount}, cell=`, cell);
+          }
+        }
+      });
+    });
+  </script>
+  

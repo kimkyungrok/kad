@@ -1,0 +1,55 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">프로모션 공지</h2>
+
+  <% if (promos.length === 0) { %>
+    <p class="text-center">
+      아직... <span style="font-size: 2rem;">🤣👉😭</span>
+    </p>
+  <% } else { %>
+    <% promos.forEach(promo => { %>
+      <div class="border rounded p-4 mb-4">
+        <h4 class="mb-3"><%= promo.title %></h4>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-6">
+            <p class="mb-0"><strong>지급 유형:</strong> <%= promo.paymentType %></p>
+          </div>
+          <div class="col-12 col-md-6">
+            <p class="mb-0"><strong>지급 조건:</strong> <%= promo.conditionType %></p>
+          </div>
+        </div>
+
+        <% if (promo.type === 'text') { %>
+          <div class="bg-light p-3" style="white-space: pre-wrap;">
+            <%= promo.content %>
+          </div>
+        <% } else if (promo.type === 'table') { %>
+          <div class="table-responsive mt-3">
+            <table class="table table-bordered table-sm align-middle text-center">
+              <% Object.values(promo.content).forEach(row => { %>
+                <tr>
+                  <% Object.values(row).forEach(cell => { %>
+                    <td><%= cell %></td>
+                  <% }) %>
+                </tr>
+              <% }) %>
+            </table>
+          </div>
+        <% } %>
+
+        <div class="mt-3">
+          <p class="mb-1"><strong>작성일:</strong> <%= new Date(promo.createdAt).toLocaleString('ko-KR') %></p>
+          <p class="text-muted mb-0">※ 프로모션 지급은 별도의 고지가 없을 경우 매 정산일에 지급합니다.</p>
+        </div>
+
+        <% if (user && (user.username === 'krogy' || user.username === 'admin')) { %>
+          <form action="/promo/<%= promo._id %>/delete" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+            <button type="submit" class="btn btn-sm btn-danger mt-3">삭제</button>
+          </form>
+        <% } %>
+      </div>
+    <% }) %>
+  <% } %>
+</div>

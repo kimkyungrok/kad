@@ -644,7 +644,6 @@ app.post('/upload-excel', upload.single('file'), (req, res) => {
           const cell = worksheet[cellRef];
 
           if (cell && cell.t === 'n') {
-            // 수치가 20000 이상이면 날짜로 간주
             if (cell.v > 20000 && cell.v < 60000) {
               const date = XLSX.SSF.parse_date_code(cell.v);
               if (date) {
@@ -670,7 +669,73 @@ app.post('/upload-excel', upload.single('file'), (req, res) => {
 
     global.excelFileName = file.originalname;
 
+    // ✅ 추가: 2번째 시트에서 C18~ 아래 행 추출
+    const secondSheetName = workbook.SheetNames[1]; // 인덱스 1: 두 번째 시트
+    const secondSheetData = sheets[secondSheetName];
+
+    const riderData = [];
+
+    for (let i = 17; i < secondSheetData.length; i++) {
+      const row = secondSheetData[i];
+      const name = row[2];  // C열
+      const value = row[3]; // D열
+
+      if (name && name.toString().trim() !== '') {
+        riderData.push({
+          name: name.toString().trim(),
+          value: parseFloat(value) || 0
+        });
+      }
+    }
+
+    // ✅ 병합 그룹 정의
+const mergeGroups = [
+  { name: '함형민', aliases: ['함형민', '김세라'] },
+  { name: '장래규', aliases: ['장래규', '임미경'] },
+  { name: '이상협', aliases: ['이상협', '김주은'] }
+];
+
+// 2. 병합
+const mergedData = [];
+const usedNames = new Set();
+
+mergeGroups.forEach(group => {
+  let total = 0;
+  riderData.forEach(item => {
+    if (group.aliases.includes(item.name)) {
+      total += item.value;
+      usedNames.add(item.name);
+    }
+  });
+  mergedData.push({ name: group.name, value: total });
+});
+
+// 3. 병합되지 않은 나머지 데이터 추가
+riderData.forEach(item => {
+  if (!usedNames.has(item.name)) {
+    mergedData.push(item);
+  }
+});
+
+// 4. 정렬
+mergedData.sort((a, b) => b.value - a.value);
+
+// 5. 장래규, 이상협 제거
+const filtered = mergedData.filter(item => item.name !== '장래규' && item.name !== '이상협');
+
+// 6. 상위 5명에게만 등수 부여
+const finalData = filtered.map((item, index) => {
+  if (index < 5) {
+    return { ...item, rank: `${index + 1}등` };
+  } else {
+    return { ...item, rank: '' };
+  }
+});
+
+global.riderData = finalData;
+
     console.log('엑셀 업로드 성공:', global.excelFileName);
+    console.log('라이더 정산 데이터 수:', mergedData.length);
 
     fs.unlink(file.path, (err) => {
       if (err) console.error('임시파일 삭제 실패:', err);
@@ -682,6 +747,7 @@ app.post('/upload-excel', upload.single('file'), (req, res) => {
     res.status(500).send('엑셀 파일 읽기 실패');
   }
 });
+
 
 
 //서버에 엑셀 데이터 조회 API
@@ -754,4 +820,61 @@ app.post('/update-my-info', 로그인필요, async (req, res) => {
 app.get('/promoReg', async (req, res) => {
   const users = await db.collection('users').find().toArray();
   res.render('promoReg', { users });
+});
+
+// promoReg.ejs 제출 처리
+app.get('/promoReg', 로그인필요, (req, res) => {
+  if (!['admin', 'krogy'].includes(req.session.user?.username)) {
+    return res.status(403).render('error', { title: '접근 거부', message: '이 페이지에 접근할 수 있는 권한이 없습니다.' });
+  }
+  // users 배열이 필요하다면 DB에서 불러오도록 처리
+  res.render('promoReg', { users: [] });
+});
+
+app.post('/promoReg', 로그인필요, async (req, res) => {
+  if (!['admin', 'krogy'].includes(req.session.user?.username)) {
+    return res.status(403).send('접근 권한이 없습니다.');
+  }
+
+  const { promoTitle, paymentType, conditionType, promoText, tableData } = req.body;
+
+  const promo = {
+    title: promoTitle,
+    paymentType,
+    conditionType,
+    type: promoText ? 'text' : 'table',
+    content: promoText || tableData || {},
+    createdAt: new Date()
+  };
+
+  await db.collection('promotions').insertOne(promo);
+  res.redirect('/promoPage');
+});
+
+//프로모션 페이지 랜더링
+app.get('/promoPage', 로그인필요, async (req, res) => {
+  const promos = await db.collection('promotions').find().sort({ createdAt: -1 }).toArray();
+  res.render('promoPage', { promos });
+});
+
+//프로모션 페이지 삭제 기능
+app.post('/promo/:id/delete', 로그인필요, async (req, res) => {
+  if (!['krogy', 'admin'].includes(req.session.user?.username)) {
+    return res.status(403).render('error', {
+      title: '삭제 권한 없음',
+      message: '관리자만 삭제할 수 있습니다.'
+    });
+  }
+
+  await db.collection('promotions').deleteOne({ _id: new ObjectId(req.params.id) });
+  res.redirect('/promoPage');
+});
+
+
+app.get('/accountTable', async (req, res) => {
+  const promos = await db.collection('promotions').find({}).toArray();
+  res.render('accountTable', {
+    riderData: global.riderData || [],
+    promos
+  });
 });

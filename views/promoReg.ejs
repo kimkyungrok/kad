@@ -1,0 +1,120 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">프로모션</h2>
+  <form action="/promoReg" method="POST">
+    <!-- 프로모션 정보 그룹 -->
+    <div class="border rounded p-4 mb-4">
+      <div class="mb-3">
+        <label for="promoTitle" class="form-label">프로모션 이름</label>
+        <input type="text" id="promoTitle" name="promoTitle" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="paymentType" class="form-label">지급 유형</label>
+        <select id="paymentType" name="paymentType" class="form-select" required>
+          <option value="">선택</option>
+          <option value="세트 달성시 지급">세트 달성시 지급</option>
+          <option value="일반 일괄 지급">일반 일괄 지급</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="conditionType" class="form-label">지급 조건</label>
+        <select id="conditionType" name="conditionType" class="form-select" required>
+          <option value="">선택</option>
+          <option value="기여도">기여도</option>
+          <option value="대상자 선정">대상자 선정</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 프로모션 내용 그룹 -->
+    <div class="border rounded p-4 mb-4">
+      <div class="mb-3">
+        <label for="contentType" class="form-label">프로모션 내용 입력 유형</label>
+        <select id="contentType" class="form-select" onchange="toggleContentInput()">
+          <option value="">선택</option>
+          <option value="text">텍스트 입력</option>
+          <option value="table">테이블 입력</option>
+        </select>
+      </div>
+
+      <!-- 텍스트 입력 -->
+      <div id="textInputGroup" class="d-none mb-3">
+        <label class="form-label">내용 입력</label>
+        <textarea name="promoText" class="form-control" rows="5" placeholder="내용을 입력하세요..."></textarea>
+      </div>
+
+      <!-- 테이블 설정 입력 -->
+      <div id="tableSetupGroup" class="d-none mb-3">
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">행 수</label>
+            <input type="number" id="rowCount" class="form-control" min="1">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">열 수</label>
+            <input type="number" id="colCount" class="form-control" min="1">
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline-secondary mt-2" onclick="generateTable()">테이블 생성</button>
+      </div>
+
+      <!-- 동적 테이블 입력 영역 -->
+      <div id="dynamicTableContainer" class="table-responsive d-none mt-3"></div>
+      
+    </div>
+
+    <div class="text-end">
+      <button type="submit" class="btn btn-primary">저장</button>
+    </div>
+    <input type="hidden" name="createdAt" id="createdAt">
+  </form>
+</div>
+
+<script>
+  function toggleContentInput() {
+    const type = document.getElementById('contentType').value;
+    document.getElementById('textInputGroup').classList.add('d-none');
+    document.getElementById('tableSetupGroup').classList.add('d-none');
+    document.getElementById('dynamicTableContainer').classList.add('d-none');
+    document.getElementById('createdAt').value = new Date().toISOString();
+
+    if (type === 'text') {
+      document.getElementById('textInputGroup').classList.remove('d-none');
+    } else if (type === 'table') {
+      document.getElementById('tableSetupGroup').classList.remove('d-none');
+    }
+  }
+
+  function generateTable() {
+    const rows = parseInt(document.getElementById('rowCount').value);
+    const cols = parseInt(document.getElementById('colCount').value);
+    const container = document.getElementById('dynamicTableContainer');
+    container.innerHTML = '';
+
+    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) return;
+
+    const table = document.createElement('table');
+    table.className = 'table table-bordered';
+
+    for (let i = 0; i < rows; i++) {
+      const tr = document.createElement('tr');
+      for (let j = 0; j < cols; j++) {
+        const td = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = `tableData[${i}][${j}]`;
+        input.className = 'form-control';
+        td.appendChild(input);
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+
+    container.appendChild(table);
+    container.classList.remove('d-none');
+  }
+</script>
