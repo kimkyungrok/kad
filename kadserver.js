@@ -15,6 +15,7 @@ const uploadPath = 'public/uploads';
 const isAdmin = require('./middlewares/isAdmin');
 const now = new Date();
 const nowKST = new Date(now.getTime() + 9 * 60 * 60 * 1000); // KST
+const bodyParser = require('body-parser');
 app.use('/uploads', express.static('/public/uploads'));
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,6 +23,8 @@ app.set('view engine', 'ejs');
 app.engine('ejs', engine);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(session({
   secret: '비밀코드',
@@ -73,15 +76,15 @@ function 로그인필요(req, res, next) {
 
 
 // 아이디 중복확인 API
-app.get('/check-username', async (req, res) => {
-  const username = req.query.username;
-  const user = await db.collection('users').findOne({ username });
-  
-  if (user) {
-    res.json({ exists: true });
-  } else {
-    res.json({ exists: false });
+app.post('/check-username', async (req, res) => {
+  const { username } = req.body;
+  const existingUser = await db.collection('users').findOne({ username });
+
+  if (existingUser) {
+    return res.json({ status: 'error', message: '이미 사용 중인 아이디입니다.' });
   }
+
+  return res.json({ status: 'success', message: '사용 가능한 아이디입니다.' });
 });
 
 // 메인 페이지 (홈)
@@ -130,53 +133,35 @@ app.get('/login-fail', (req, res) => {
 // 회원가입 처리 (비밀번호 해시화 없이 저장)
 app.post('/register', async (req, res) => {
   try {
-    const {
-      username,
-      password,
-      passwordConfirm,
-      name,
-      connectId,
-      phone,
-      birthdate,
-      branch,
-      bankNameSelect,  // 드롭다운 값
-      bankNameInput,   // 직접입력 값
-      accountNumber,
-      depositAccount
-    } = req.body;
+    const { username, password, passwordConfirm, name, connectId, phone, birthdate, branch, bankNameSelect, bankNameInput, accountNumber, depositAccount } = req.body;
 
-    // 필수 항목 체크
     if (!username || !password || !passwordConfirm || !name || !connectId || !phone || !birthdate || !branch || !accountNumber || !depositAccount) {
-      return res.status(400).send('모든 필수 입력 항목을 채워주세요.');
+      return res.json({ status: 'error', message: '모든 필수 입력 항목을 채워주세요.' });
     }
 
-    // 비밀번호 일치 검사
     if (password !== passwordConfirm) {
-      return res.status(400).send('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+      return res.json({ status: 'error', message: '비밀번호와 비밀번호 확인이 일치하지 않습니다.' });
     }
 
-    // 비밀번호 복잡도 검사
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=\-{}\[\]:;"'<>,.?/]).{8,}$/;
     if (!passwordPattern.test(password)) {
-      return res.status(400).send('비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.');
+      return res.json({ status: 'error', message: '비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.' });
     }
 
-    // 최종 은행명 결정
     const finalBankName = bankNameSelect === '직접입력' ? bankNameInput : bankNameSelect;
     if (!finalBankName) {
-      return res.status(400).send('은행명을 선택하거나 입력해주세요.');
+      return res.json({ status: 'error', message: '은행명을 선택하거나 입력해주세요.' });
     }
 
-    // 아이디 중복 확인
     const existingUser = await db.collection('users').findOne({ username });
     if (existingUser) {
-      return res.status(409).send('이미 사용 중인 아이디입니다.');
+      return res.json({ status: 'error', message: '이미 사용 중인 아이디입니다.' });
     }
 
-    // DB 저장
+    const nowKST = new Date(Date.now() + 9 * 60 * 60 * 1000);
     await db.collection('users').insertOne({
       username,
-      password,  // 실제 운영 환경에서는 bcrypt 해싱 필요
+      password,
       name,
       connectId,
       phone,
@@ -185,19 +170,17 @@ app.post('/register', async (req, res) => {
       bankName: finalBankName,
       accountNumber,
       depositAccount,
+      approved: false,
       createdAt: nowKST
     });
 
-    console.log(`회원가입 완료: ${username}`);
-    res.redirect('/login');
-
+    console.log(`회원가입 완료 (승인 대기): ${username}`);
+    res.json({ status: 'success', message: '회원가입 신청이 완료되었습니다. 관리자의 승인을 기다려주세요.' });
   } catch (err) {
     console.error(err);
     res.status(500).send('서버 오류 발생');
   }
 });
-
-
 
 // 로그인 페이지
 app.get('/login', (req, res) => {
@@ -206,20 +189,38 @@ app.get('/login', (req, res) => {
 
 // 로그인 처리 (로그인 성공 시 환영 화면으로 이동)
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = await db.collection('users').findOne({ username });
+  try {
+    const { username, password } = req.body;
+    const db = req.app.locals.db;
 
-  if (user && user.password === password) {
+    const user = await db.collection('users').findOne({ username });
+
+    if (!user || user.password !== password) {
+      return res.redirect('/login-fail');
+    }
+
+    if (!user.approved) {
+      return res.redirect('/approved');
+    }
+
     req.session.user = user;
-    res.redirect('/welcome'); // 성공하면 /welcome으로 이동
-  } else {
-    res.redirect('/login-fail'); // 실패하면 /login-fail로 이동
+    res.redirect('/welcome');
+
+  } catch (err) {
+    console.error('❌ 로그인 오류:', err);
+    res.status(500).send('서버 오류 발생');
   }
 });
+
 
 // 로그인 실패 페이지
 app.get('/login-fail', (req, res) => {
   res.render('login-fail');
+});
+
+// 가입 승인 대기 페이지
+app.get('/approved', (req, res) => {
+  res.render('approved');
 });
 
 // 개인 맞춤 게시판
@@ -1022,4 +1023,25 @@ app.post('/admin-register/delete', async (req, res) => {
     console.error(err);
     res.status(500).send('삭제 실패');
   }
+});
+
+app.get('/admin-pending', async (req, res) => {
+  const db = req.app.locals.db;
+  const users = await db.collection('users').find({ approved: false }).toArray();
+  res.render('admin-pending', { users });
+});
+
+app.post('/approve-user/:id', async (req, res) => {
+  const db = req.app.locals.db;
+  await db.collection('users').updateOne(
+    { _id: new ObjectId(req.params.id) },
+    { $set: { approved: true } }
+  );
+  res.redirect('/admin-pending');
+});
+
+app.post('/reject-user/:id', async (req, res) => {
+  const db = req.app.locals.db;
+  await db.collection('users').deleteOne({ _id: new ObjectId(req.params.id) });
+  res.redirect('/admin-pending');
 });

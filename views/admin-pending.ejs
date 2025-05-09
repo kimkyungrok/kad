@@ -1,0 +1,79 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">승인 대기 사용자 목록</h2>
+
+  <% if (users.length === 0) { %>
+    <p class="text-center">현재 승인 대기 중인 사용자가 없습니다.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>이름</th>
+            <th>아이디</th>
+            <th>지사</th>
+            <th>전화번호</th>
+            <th>상태</th>
+            <th>승인 / 거부</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(user => { %>
+            <tr>
+              <td><%= user.name %></td>
+              <td><%= user.username %></td>
+              <td><%= user.branch %></td>
+              <td><%= user.phone %></td>
+              <td>
+                <span class="badge bg-warning text-dark">승인 대기</span>
+              </td>
+              <td>
+                <form method="POST" action="/approve-user/<%= user._id %>" style="display:inline;">
+                  <button type="submit" class="btn btn-success btn-sm mb-1">승인</button>
+                </form>
+                <form method="POST" action="/reject-user/<%= user._id %>" style="display:inline;" onsubmit="return confirm('정말 거부하시겠습니까?');">
+                  <button type="submit" class="btn btn-danger btn-sm">거부</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<style>
+  /* 반응형 디자인을 위한 테이블 조정 */
+  @media (max-width: 768px) {
+    .table-responsive {
+      overflow-x: auto; /* 화면이 좁을 때 가로 스크롤 가능 */
+    }
+
+    table {
+      width: 100%; /* 테이블이 부모 컨테이너의 전체 너비를 차지하게 설정 */
+    }
+
+    th, td {
+      padding: 0.75rem; /* 테이블 셀의 패딩을 다소 축소 */
+    }
+
+    /* 작은 화면에서 글자 크기 조정 */
+    .table th, .table td {
+      font-size: 1rem;
+    }
+
+    /* 버튼 크기 조정 */
+    .btn-sm {
+      padding: 0.25rem 0.5rem; 
+      font-size: 0.875rem;
+    }
+  }
+
+  /* 모바일 및 작은 화면에서도 충분히 큰 버튼 */
+  .btn {
+    font-size: 1rem; /* 버튼 텍스트 크기 */
+    padding: 0.5rem 1rem; /* 버튼 패딩 */
+  }
+</style>

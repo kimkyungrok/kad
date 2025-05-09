@@ -39,13 +39,13 @@
       <ul class="navbar-nav ms-auto">
 
         <li class="nav-item"><a class="nav-link" href="/">홈</a></li>
-
         <% if (!user) { %>
           <li class="nav-item"><a class="nav-link" href="/register">회원가입</a></li>
           <li class="nav-item"><a class="nav-link" href="/login">로그인</a></li>
         <% } else { %>
 
           <% if (['krogy', 'admin'].includes(user.username)) { %>
+            <li class="nav-item"><a class="nav-link" href="/admin-pending">가입 승인</a></li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">관리자 메뉴</a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -53,8 +53,8 @@
                 <li><a class="dropdown-item" href="/promoReg">프로모션 등록</a></li>
                 <li><a class="dropdown-item" href="/accountTable">프로모션 결과 확인/공지</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/write">정산서 등록</a></li>
-                <li><a class="dropdown-item" href="/accounts">정산서 파일 업로드</a></li>
+                <li><a class="dropdown-item" href="/write">지급 정산서 등록</a></li>
+                <li><a class="dropdown-item" href="/accounts">기준 정산서 업로드</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/admin-register">관리자 등록</a></li>
               </ul>
