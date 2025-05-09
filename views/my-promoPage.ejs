@@ -45,7 +45,7 @@
       <% allPromos.forEach((p, idx) => { %>
         <li class="list-group-item">
           <a href="#" class="promo-history-item" data-index="<%= idx %>">
-            <%= new Date(p.createdAt).toLocaleString('ko-KR') %> - <%= p.date %> (<%= p.createdBy %>)
+            <span id="nowKSTTime"></span>(<%= p.createdBy %>)
           </a>
         </li>
       <% }) %>
@@ -102,7 +102,7 @@
           modalInfo.innerHTML = `
             <strong>📅 작성일:</strong> ${promo.date}<br>
             <strong>👤 작성자:</strong> ${promo.createdBy}<br>
-            <strong>🕒 등록일:</strong> ${new Date(promo.createdAt).toLocaleString('ko-KR')}
+            <strong>🕒 등록일:</strong> ${new Date(promo.createdAt).nowKST}
           `;
 
           modalTable.innerHTML = '';
@@ -137,4 +137,23 @@
             alert('삭제 중 오류가 발생했습니다.');
           });
       });
+
+
+      // KST 시간 구하기 (UTC + 9)
+      const now = new Date();
+      const nowKST = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+      const yyyy = nowKST.getFullYear();
+      const mm = String(nowKST.getMonth() + 1).padStart(2, '0');
+      const dd = String(nowKST.getDate()).padStart(2, '0');
+      const hh = String(nowKST.getHours()).padStart(2, '0');
+      const min = String(nowKST.getMinutes()).padStart(2, '0');
+      const ss = String(nowKST.getSeconds()).padStart(2, '0');
+
+      const formatted = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+
+      // 원하는 위치에 출력
+      document.getElementById('nowKSTTime').innerText = formatted;
+
+
     </script>

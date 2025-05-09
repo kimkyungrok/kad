@@ -12,7 +12,9 @@ const upload = multer({ dest: 'public/uploads/' });
 const fs = require('fs');
 const port = process.env.PORT || 3000;
 const uploadPath = 'public/uploads';
-
+const isAdmin = require('./middlewares/isAdmin');
+const now = new Date();
+const nowKST = new Date(now.getTime() + 9 * 60 * 60 * 1000); // KST
 app.use('/uploads', express.static('/public/uploads'));
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -49,6 +51,7 @@ new MongoClient(url)
   .then(client => {
     console.log('DB 연결 성공');
     db = client.db('test_kad');
+     app.locals.db = db;
   app.listen(port, () => {
       console.log('Server listening on ${port}');
     });
@@ -66,6 +69,8 @@ function 로그인필요(req, res, next) {
     res.redirect('/login');
   }
 }
+
+
 
 // 아이디 중복확인 API
 app.get('/check-username', async (req, res) => {
@@ -180,7 +185,7 @@ app.post('/register', async (req, res) => {
       bankName: finalBankName,
       accountNumber,
       depositAccount,
-      createdAt: new Date()
+      createdAt: nowKST
     });
 
     console.log(`회원가입 완료: ${username}`);
@@ -265,14 +270,8 @@ app.get('/my-posts', 로그인필요, async (req, res) => {
 });
 
 // 등록된 유저 목록 페이지
-app.get('/users', 로그인필요, async (req, res) => {
+app.get('/users', 로그인필요, isAdmin, async (req, res) => {
   try {
-    // 현재 로그인한 사용자가 krogy 인지 확인
-    const allowedUsers = ['krogy', 'admin'];
-    if (!allowedUsers.includes(req.session.user.username)) {
-      return res.status(403).send('접근 권한이 없습니다.');
-    }
-
     const users = await db.collection('users').find().toArray();
     res.render('users', { title: '등록된 유저 목록', users });
   } catch (err) {
@@ -345,14 +344,9 @@ app.get('/find-user', async (req, res) => {
 
 // 글 등록 처리
 // write POST - krogy/admin만 저장 가능
-app.post('/write', async (req, res) => {
+app.post('/write', 로그인필요, isAdmin, async (req, res) => {
   try {
     const currentUser = req.session.user;
-
-    // krogy나 admin만 작성 허용
-    if (!currentUser || (currentUser.username !== 'krogy' && currentUser.username !== 'admin')) {
-      return res.status(403).send('<h2>권한이 없습니다. 관리자만 작성 가능합니다.</h2><a href="/">홈으로</a>');
-    }
 
     // 입력 폼에서 데이터 추출
     const {
@@ -367,8 +361,7 @@ app.post('/write', async (req, res) => {
       settlementStart, settlementEnd, payDay ,statementPaper
     } = req.body;
 
-    // 제목 자동 생성
-    const now = new Date();
+    const now = new Date(now.getTime() + 9 * 60 * 60 * 1000); // UTC+9
     const D = d => d.toString().padStart(2, '0');
     const hour = now.getHours(), ampm = hour < 12 ? '오전' : '오후', hour12 = hour % 12 || 12;
     const minutes = D(now.getMinutes());
@@ -415,10 +408,9 @@ app.post('/write', async (req, res) => {
       settlementEnd,
       payDay,
       confirmed: 'no',
-      createdAt: new Date()
+      createdAt: nowKST
     };
 
-    // 저장
     await db.collection('posts').insertOne(newPost);
     res.redirect('/my-posts');
   } catch (err) {
@@ -427,13 +419,9 @@ app.post('/write', async (req, res) => {
   }
 });
 
-// 삭제 처리
-app.post('/delete-posts', async (req, res) => {
-  const currentUser = req.session.user;
-  if (!['krogy', 'admin'].includes(currentUser?.username)) {
-    return res.status(403).send('권한이 없습니다.');
-  }
 
+// 삭제 처리
+app.post('/delete-posts', 로그인필요, isAdmin, async (req, res) => {
   try {
     const deleteIds = Array.isArray(req.body.deleteIds) ? req.body.deleteIds : [req.body.deleteIds];
 
@@ -446,6 +434,7 @@ app.post('/delete-posts', async (req, res) => {
     res.status(500).send('게시글 삭제 중 오류 발생');
   }
 });
+
 
 
 // 게시글 상세보기
@@ -477,18 +466,23 @@ app.post('/post/:id/delete', 로그인필요, async (req, res) => {
       return res.status(404).send('게시글을 찾을 수 없습니다.');
     }
 
-    // krogy, admin 계정이거나 본인 글일 경우 삭제 허용
-    if (user.username === 'krogy' || user.username === 'admin' ) { //|| post.author === user.username
+    // 관리자 여부 확인
+    const isAdminUser = await req.app.locals.db.collection('admins').findOne({ username: user.username });
+
+    // 관리자이거나 작성자 본인이면 삭제 허용
+    if (isAdminUser || post.username === user.username) {
       await db.collection('posts').deleteOne({ _id: new ObjectId(postId) });
       return res.redirect('/my-posts');
     } else {
       return res.status(403).send('삭제 권한이 없습니다.');
     }
+
   } catch (err) {
-    console.error(err);
-    res.status(500).send('게시글 삭제 중 오류 발생');
+    console.error('게시글 삭제 중 오류:', err);
+    res.status(500).send('게시글 삭제 중 서버 오류 발생');
   }
 });
+
 
 // 정산서 본인 확인
 app.post('/post/:id/confirm', 로그인필요, async (req, res) => {
@@ -509,29 +503,23 @@ app.post('/post/:id/confirm', 로그인필요, async (req, res) => {
 
 
 // 수정 폼 페이지
-app.get('/edit-user/:id', 로그인필요, async (req, res) => {
-  const allowedUsers = ['krogy', 'admin'];
-  if (!allowedUsers.includes(req.session.user.username)) {
-    return res.status(403).send('접근 권한이 없습니다.');
-  }
+app.get('/edit-user/:id', 로그인필요, isAdmin, async (req, res) => {
+  try {
+    const user = await db.collection('users').findOne({ _id: new ObjectId(req.params.id) });
+    if (!user) {
+      return res.status(404).send('사용자를 찾을 수 없습니다.');
+    }
 
-  const user = await db.collection('users').findOne({ _id: new ObjectId(req.params.id) });
-  res.render('edit-user', { title: '가입자 수정', user });
+    res.render('edit-user', { title: '가입자 수정', user });
+  } catch (err) {
+    console.error('사용자 정보 조회 오류:', err);
+    res.status(500).send('서버 오류');
+  }
 });
 
+
 // 수정 저장 처리
-app.post('/edit-user/:id', async (req, res) => {
-  // 로그인 확인
-  if (!req.session || !req.session.user) {
-    return res.status(401).send('로그인이 필요합니다.');
-  }
-
-  // 관리자 계정만 수정 가능
-  const allowedUsers = ['krogy', 'admin'];
-  if (!allowedUsers.includes(req.session.user.username)) {
-    return res.status(403).send('접근 권한이 없습니다.');
-  }
-
+app.post('/edit-user/:id', 로그인필요, isAdmin, async (req, res) => {
   try {
     const {
       name,
@@ -563,13 +551,14 @@ app.post('/edit-user/:id', async (req, res) => {
     );
 
     console.log(`✅ 사용자 정보 수정 완료: ${req.params.id}`);
-    res.redirect('/user-list'); // ✅ 목록 페이지로 이동
-
+    res.redirect('/user-list');
+    
   } catch (err) {
     console.error('❌ 사용자 수정 실패:', err);
     res.status(500).send('서버 오류로 인해 사용자 정보를 수정할 수 없습니다.');
   }
 });
+
 
 app.get('/user-list', async (req, res) => {
   try {
@@ -607,7 +596,7 @@ const storage = multer.diskStorage({
     cb(null, 'public/uploads/');
   },
   filename: (req, file, cb) => {
-    const now = new Date();
+    const now = new Date(now.getTime() + 9 * 60 * 60 * 1000); // UTC+9
     const D = n => n.toString().padStart(2, '0');
     const datePart = `${now.getFullYear()}.${D(now.getMonth() + 1)}.${D(now.getDate())}`;
     const timePart = `${D(now.getHours())}-${D(now.getMinutes())}`;
@@ -617,28 +606,32 @@ const storage = multer.diskStorage({
 });
 
 // 업로드 라우터
-app.post('/upload-welcome-image', 로그인필요, upload.single('welcomeImage'), async (req, res) => {
-  const currentUser = req.session.user;
+app.post(
+  '/upload-welcome-image',
+  로그인필요,
+  isAdmin,
+  upload.single('welcomeImage'),
+  async (req, res) => {
+    try {
+      const uploadedImagePath = '/uploads/' + req.file.filename;
 
-  if (currentUser.username !== 'krogy' && currentUser.username !== 'admin') {
-    return res.status(403).send('권한이 없습니다.');
+      // DB에 저장
+      await db.collection('site_settings').updateOne(
+        { key: 'latestWelcomeImage' },
+        { $set: { value: uploadedImagePath } },
+        { upsert: true }
+      );
+
+      // 세션에도 저장
+      req.session.user.uploadedImagePath = uploadedImagePath;
+
+      res.redirect('/welcome');
+    } catch (err) {
+      console.error('이미지 업로드 실패:', err);
+      res.status(500).send('이미지 저장 중 오류 발생');
+    }
   }
-
-  const uploadedImagePath = '/uploads/' + req.file.filename;
-
-  // DB의 users 컬렉션에 업로드 경로 저장
-  await db.collection('site_settings').updateOne(
-    { key: 'latestWelcomeImage' },
-    { $set: { value: uploadedImagePath } },
-    { upsert: true }
-  );
-  
-
-  // 세션에도 바로 반영
-  req.session.user.uploadedImagePath = uploadedImagePath;
-
-  res.redirect('/welcome');  // 다시 welcome 페이지로 이동
-});
+);
 
 
 let excelData = {}; // 메모리에 저장 (간단 버전)
@@ -850,33 +843,38 @@ app.get('/promoReg', async (req, res) => {
 });
 
 // promoReg.ejs 제출 처리
-app.get('/promoReg', 로그인필요, (req, res) => {
-  if (!['admin', 'krogy'].includes(req.session.user?.username)) {
-    return res.status(403).render('error', { title: '접근 거부', message: '이 페이지에 접근할 수 있는 권한이 없습니다.' });
+app.get('/promoReg', 로그인필요, isAdmin, async (req, res) => {
+  try {
+    const users = await db.collection('users').find().toArray();
+    res.render('promoReg', { users });
+  } catch (err) {
+    console.error('프로모션 등록 페이지 로딩 실패:', err);
+    res.status(500).send('서버 오류');
   }
-  // users 배열이 필요하다면 DB에서 불러오도록 처리
-  res.render('promoReg', { users: [] });
 });
 
-app.post('/promoReg', 로그인필요, async (req, res) => {
-  if (!['admin', 'krogy'].includes(req.session.user?.username)) {
-    return res.status(403).send('접근 권한이 없습니다.');
+
+app.post('/promoReg', 로그인필요, isAdmin, async (req, res) => {
+  try {
+    const { promoTitle, paymentType, conditionType, promoText, tableData } = req.body;
+
+    const promo = {
+      title: promoTitle,
+      paymentType,
+      conditionType,
+      type: promoText ? 'text' : 'table',
+      content: promoText || tableData || {},
+      createdAt: nowKST
+    };
+
+    await db.collection('promotions').insertOne(promo);
+    res.redirect('/promoPage');
+  } catch (err) {
+    console.error('프로모션 등록 오류:', err);
+    res.status(500).send('서버 오류');
   }
-
-  const { promoTitle, paymentType, conditionType, promoText, tableData } = req.body;
-
-  const promo = {
-    title: promoTitle,
-    paymentType,
-    conditionType,
-    type: promoText ? 'text' : 'table',
-    content: promoText || tableData || {},
-    createdAt: new Date()
-  };
-
-  await db.collection('promotions').insertOne(promo);
-  res.redirect('/promoPage');
 });
+
 
 //프로모션 페이지 랜더링
 app.get('/promoPage', 로그인필요, async (req, res) => {
@@ -885,17 +883,19 @@ app.get('/promoPage', 로그인필요, async (req, res) => {
 });
 
 //프로모션 페이지 삭제 기능
-app.post('/promo/:id/delete', 로그인필요, async (req, res) => {
-  if (!['krogy', 'admin'].includes(req.session.user?.username)) {
-    return res.status(403).render('error', {
-      title: '삭제 권한 없음',
-      message: '관리자만 삭제할 수 있습니다.'
+app.post('/promo/:id/delete', 로그인필요, isAdmin, async (req, res) => {
+  try {
+    await db.collection('promotions').deleteOne({ _id: new ObjectId(req.params.id) });
+    res.redirect('/promoPage');
+  } catch (err) {
+    console.error('프로모션 삭제 오류:', err);
+    res.status(500).render('error', {
+      title: '서버 오류',
+      message: '프로모션 삭제 중 오류가 발생했습니다.'
     });
   }
-
-  await db.collection('promotions').deleteOne({ _id: new ObjectId(req.params.id) });
-  res.redirect('/promoPage');
 });
+
 
 
 app.get('/accountTable', async (req, res) => {
@@ -914,7 +914,7 @@ app.post('/save-promo-result', 로그인필요, async (req, res) => {
     await db.collection('promotion_results').insertOne({
       date,
       data,
-      createdAt: new Date(),
+      createdAt: nowKST,
       createdBy: user.username
     });
 
@@ -980,5 +980,46 @@ app.delete('/promo-result/:id', 로그인필요, async (req, res) => {
   } catch (err) {
     console.error('삭제 실패:', err);
     res.status(500).json({ message: '서버 오류' });
+  }
+});
+
+// 🔹 관리자 페이지 렌더링
+app.get('/admin-register', async (req, res) => {
+  try {
+    const admins = await db.collection('admins').find().sort({ createdAt: -1 }).toArray();
+    res.render('admin-register', { adminList: admins });
+  } catch (err) {
+    res.status(500).send('관리자 목록 불러오기 실패');
+  }
+});
+
+// 🔹 관리자 추가
+app.post('/admin-register/add', async (req, res) => {
+  const { name, username } = req.body;
+  if (!name || !username) return res.status(400).send('이름 또는 아이디 누락');
+
+  try {
+    const exists = await db.collection('admins').findOne({ username });
+    if (exists) return res.status(409).send('이미 등록된 아이디입니다.');
+
+    await db.collection('admins').insertOne({ name, username, createdAt: new Date() });
+    res.status(200).send('등록 성공');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('DB 저장 실패');
+  }
+});
+
+// 🔹 관리자 삭제
+app.post('/admin-register/delete', async (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).send('아이디 누락');
+
+  try {
+    await db.collection('admins').deleteOne({ username });
+    res.status(200).send('삭제 성공');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('삭제 실패');
   }
 });

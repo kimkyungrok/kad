@@ -1,0 +1,136 @@
+<% layout('layout') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4">관리자 등록</h2>
+
+  <div class="border p-4 mb-4 rounded">
+    <h4 class="mb-3">관리자 등록</h4>
+    <div class="row g-2">
+      <div class="col-md-6">
+        <input type="text" id="adminNameInput" class="form-control" placeholder="이름 입력">
+      </div>
+      <div class="col-md-6">
+        <input type="text" id="adminIdInput" class="form-control" placeholder="아이디 입력 (영문/숫자만)">
+      </div>
+    </div>
+    <button class="btn btn-success mt-3 w-100" onclick="addAdmin()">추가</button>
+  </div>
+
+  <div class="border p-4 rounded">
+    <h4 class="mb-3">관리자 리스트</h4>
+
+    <!-- PC -->
+    <div class="table-responsive d-none d-md-block">
+      <table class="table table-bordered text-center">
+        <thead class="table-light">
+          <tr><th>이름</th><th>아이디</th><th>관리</th></tr>
+        </thead>
+        <tbody>
+          <% if (adminList.length === 0) { %>
+            <tr><td colspan="3">등록된 관리자가 없습니다.</td></tr>
+          <% } else { %>
+            <% adminList.forEach(admin => { %>
+              <tr>
+                <td><%= admin.name %></td>
+                <td><%= admin.username %></td>
+                <td>
+                  <button class="btn btn-sm btn-danger" onclick="deleteAdmin('<%= admin.username %>')">삭제</button>
+                </td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 모바일 -->
+    <div class="d-block d-md-none">
+      <% if (adminList.length === 0) { %>
+        <p>등록된 관리자가 없습니다.</p>
+      <% } else { %>
+        <% adminList.forEach(admin => { %>
+          <div class="card mb-2 admin-card">
+            <div class="card-body">
+              <p><strong>이름:</strong> <%= admin.name %></p>
+              <p><strong>아이디:</strong> <%= admin.username %></p>
+              <button class="btn btn-sm btn-danger w-100" onclick="deleteAdmin('<%= admin.username %>')">삭제</button>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <a href="/" class="btn btn-secondary">홈으로</a>
+  </div>
+</div>
+
+<script>
+  // 한글 입력 방지
+  document.addEventListener('DOMContentLoaded', () => {
+    const idInput = document.getElementById('adminIdInput');
+    idInput.addEventListener('input', () => {
+      idInput.value = idInput.value.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣\s]/g, '');
+    });
+  });
+
+  // 관리자 추가
+  async function addAdmin() {
+    const name = document.getElementById('adminNameInput').value.trim();
+    const username = document.getElementById('adminIdInput').value.trim();
+
+    if (!name || !username) return alert('이름과 아이디를 모두 입력해주세요.');
+
+    try {
+      const res = await fetch('/admin-register/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, username })
+      });
+
+      const text = await res.text();
+      if (res.ok) location.reload();
+      else alert('❌ 추가 실패: ' + text);
+    } catch (err) {
+      console.error(err);
+      alert('서버 오류 발생');
+    }
+  }
+
+  // 관리자 삭제
+  async function deleteAdmin(username) {
+    if (!confirm(`'${username}' 관리자를 삭제하시겠습니까?`)) return;
+
+    try {
+      const res = await fetch('/admin-register/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      });
+
+      const text = await res.text();
+      if (res.ok) location.reload();
+      else alert('❌ 삭제 실패: ' + text);
+    } catch (err) {
+      console.error(err);
+      alert('삭제 중 오류 발생');
+    }
+  }
+</script>
+
+<style>
+  @media (max-width: 576px) {
+    .form-control, .btn {
+      font-size: 14px;
+    }
+    .admin-card p {
+      font-size: 14px;
+      margin: 4px 0;
+    }
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+  }
+</style>
