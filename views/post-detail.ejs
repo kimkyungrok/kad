@@ -1,11 +1,9 @@
 <% layout('layout') %>
 
 <div class="container mt-5">
-  <h2 class="mb-4 text-center"><%= post.title %></h2>
-
   <div class="border rounded p-4 mb-4">
-    <h4 class="mb-4 text-center">정산 내역서</h4>
-
+    <h4 class="mb-2 text-center">정산 내역서</h4>
+    <h5 class="mb-4 text-center">작성일: <%= post.title %></h5>
     <div class="table-responsive">
       <table class="table table-bordered table-sm fs-6 text-center align-middle">
         <colgroup>
@@ -16,22 +14,25 @@
         </colgroup>
 
         <!-- 라이더 정보 -->
+        <tr>
+          </td><td colspan="2">정산 지급 예정일</td><td colspan="2"><%= post.payDay %></td>
+        </tr>
         <tr class="table-secondary">
           <th colspan="4" class="bg-light text-center">라이더 정보</th>
         </tr>
         <tr>
-          <td class="bg-body-tertiary text-start">라이더 명</td><td class="text-break text-start"><%= post.riderName %></td>
-          <td class="bg-body-tertiary text-start">수행 건수</td><td class="text-break text-start"><%= post.taskCount %></td>
+          <td style="background-color: #cdcdcd;"class="text-middle">라이더 명</td><td class="text-break text-middle"><%= post.riderName %></td>
+          <td style="background-color: #cdcdcd;"class="text-middle">수행 건수</td><td class="text-break text-middle"><%= post.taskCount %></td>
         </tr>
         <tr>
-          <td class="bg-body-tertiary text-start">주민번호</td><td class="text-break text-start" colspan="3"><%= post.residentId %></td>
+          <td style="background-color: #cdcdcd;"class="text-middle">주민번호</td><td class="text-break text-middle" colspan="3"><%= post.residentId %></td>
         </tr>
         <tr>
-          <td class="bg-body-tertiary text-start">은행명</td><td class="text-break text-start"><%= user.bankName %></td>
-          <td class="bg-body-tertiary text-start">계좌 번호</td><td class="text-break text-start"><%= post.accountNumber %></td>
+          <td style="background-color: #cdcdcd;"class="text-middle">은행명</td><td class="text-break text-middle"><%= user.bankName %></td>
+          <td style="background-color: #cdcdcd;"class="text-middle">예금주</td><td class="text-break text-middle" colspan="3"><%= post.depositAccount %></td>
         </tr>
         <tr>
-          <td class="bg-body-tertiary text-start">예금주</td><td class="text-break text-start" colspan="3"><%= post.depositAccount %></td>
+          <td style="background-color: #cdcdcd;"class="text-middle"">계좌 번호</td><td colspan="3" class="text-break text-middle"><%= post.accountNumber %></td>
         </tr>
 
         <!-- 배달료 기준 내역 -->
@@ -39,31 +40,37 @@
           <th colspan="4" class="bg-light text-center">배달료 기준 내역</th>
         </tr>
         <tr>
-          <td class="bg-success-subtle">배달료 A</td><td><%= post.deliveryFeeA %></td>
-          <td class="bg-success-subtle">추가지급 B</td><td><%= post.additionalPaymentB %></td>
+          <td colspan="2" class="bg-success-subtle">배달료 A</td><td colspan="2"><%= post.deliveryFeeA %></td>
         </tr>
         <tr>
-          <td class="bg-success-subtle" colspan="2">총 배달료 C(A+B)</td><td colspan="2"><%= post.totalDeliveryFeeC %></td>
+          <td colspan="2"  class="bg-success-subtle">추가지급 B</td><td colspan="2"><%= post.additionalPaymentB %></td>
         </tr>
-        <tr><td colspan="4"></td></tr>
+        <tr>
+          <td colspan="2"  class="bg-success-subtle" colspan="2">총 배달료 C(A+B)</td><td colspan="2"><%= post.totalDeliveryFeeC %></td>
+        </tr>
         <tr>
           <td class="bg-info-subtle">필요경비</td><td><%= post.necessaryExpense %></td>
-          <td class="bg-info-subtle">보수액</td><td><%= post.paymentAmount %></td>
-        </tr>
-        <tr>
-          <td class="bg-primary-subtle">라이더부담 산재보험료</td><td><%= post.riderIndustrialInsurance %></td>
           <td class="bg-primary-subtle">라이더부담 고용보험료</td><td><%= post.riderEmploymentInsurance %></td>
         </tr>
         <tr>
-          <td class="bg-pink">산재보험 소급정산</td><td><%= post.riderRetroIndustrial %></td>
-          <td class="bg-pink">고용보험 소급정산</td><td><%= post.riderRetroEmployment %></td>
+          <td class="bg-info-subtle">보수액</td><td><%= post.paymentAmount %></td>
+          <td class="bg-primary-subtle">라이더부담 산재보험료</td><td><%= post.riderIndustrialInsurance %></td>
         </tr>
         <tr>
-          <td class="bg-light-subtle">시간제보험료</td><td colspan="3"><%= post.insuranceFee %></td>
+          <td colspan="2"style="background-color: #b5b5b5;">산재보험 소급정산</td>
+          <td colspan="2"><%= post.riderRetroIndustrial %></td>
         </tr>
-        <tr><td colspan="4"></td></tr>
         <tr>
-          <td class="bg-danger-subtle">라이더별 정산금액(H)</td><td colspan="3"><%= post.riderFinalPaymentH %></td>
+          <td colspan="2" style="background-color: #b5b5b5;">고용보험 소급정산</td>
+          <td colspan="2"><%= post.riderRetroEmployment %></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="background-color: #74f2fb;">시간제보험료</td>
+          <td colspan="2"><%= post.insuranceFee %></td>
+        </tr>
+        
+        <tr>
+          <td class="bg-danger-subtle">라이더별 정산금액</td><td colspan="3"><%= post.riderFinalPaymentH %></td>
         </tr>
 
         <!-- 기본 공제 항목 -->
@@ -71,12 +78,12 @@
           <th colspan="4" class="bg-light text-center">기본 공제 항목</th>
         </tr>
         <tr>
-          <td class="bg-purple-subtle">소득세</td><td><%= post.incomeTax %></td>
-          <td class="bg-purple-subtle">주민세</td><td><%= post.residentTax %></td>
+          <td style="background-color: #ffa8d9;">소득세</td><td><%= post.incomeTax %></td>
+          <td style="background-color: #ffa8d9;">주민세</td><td><%= post.residentTax %></td>
         </tr>
         <tr>
-          <td class="bg-purple-subtle">원천 징수 세액<br><small>(소득세 + 주민세)</small></td>
-          <td colspan="3"><%= post.withholdingTax %></td>
+          <td colspan="2" style="background-color: #ffa8d9;">원천 징수 세액<br><small>(소득세 + 주민세)</small></td>
+          <td colspan="2"><%= post.withholdingTax %></td>
         </tr>
 
         <!-- 세트 달성 여부 -->
@@ -84,8 +91,8 @@
           <th colspan="4" class="bg-light text-center">세트 달성 여부에 따른 공제 항목<br><small>(세트 성공시 면제)</small></th>
         </tr>
         <tr>
-          <td class="bg-info">세트 달성 여부</td>
-          <td>
+          <td colspan="2" style="background-color: #beaaff;">세트 달성 여부</td>
+          <td colspan="2">
             <% if (post.setAchievement === '성공') { %>
               <span style="color: blue;"><%= post.setAchievement %></span>
             <% } else if (post.setAchievement === '실패') { %>
@@ -94,12 +101,14 @@
               <%= post.setAchievement %>
             <% } %>
           </td>
-          <td class="bg-info">세무기장료</td>
-          <td>
+        </tr>
+        <tr>
+          <td colspan="2" class="bg-info">세무기장료</td>
+          <td colspan="2">
             <% if (post.setAchievement === '실패') { %>
               <span style="color: red;"><%= post.taxFee %></span>
             <% } else { %>
-              <%= post.taxFee %>
+              <span><%= post.taxFee %></span>
             <% } %>
           </td>
         </tr>
@@ -120,10 +129,13 @@
         </tr>
         <tr>
           <td class="bg-warning-subtle">프모 단가</td><td><%= post.promoRate %></td>
-          <td class="bg-warning-subtle">최종 프로모션 지급 비용</td><td><%= post.finalPromoPayment %></td>
+          <td class="bg-warning-subtle">프모 수행 건수</td><td><%= post.promotaskCount %></td>
         </tr>
         <tr>
-          <td class="bg-warning-subtle">라이더 유류비 지원</td><td colspan="3"><%= post.fuelSupport %></td>
+          <td colspan="2" class="bg-warning-subtle">최종 프로모션 지급 비용</td><td colspan="2"><%= post.finalPromoPayment %></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="bg-warning-subtle">라이더 유류비 지원</td><td colspan="2"><%= post.fuelSupport %></td>
         </tr>
 
         <!-- 최종 지급 내역 -->
@@ -153,9 +165,7 @@
         <tr>
           <td class="bg-body-tertiary" colspan="2">정산 종료일</td><td colspan="2"><%= post.settlementEnd %></td>
         </tr>
-        <tr>
-          <td class="bg-body-tertiary" colspan="2">정산 지급일</td><td colspan="2"><%= post.payDay %></td>
-        </tr>
+        
       </table>
     </div>
 

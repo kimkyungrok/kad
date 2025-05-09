@@ -282,13 +282,40 @@ app.get('/users', 로그인필요, async (req, res) => {
 });
 
 // 글쓰기 페이지 
-app.get('/write', 로그인필요, (req, res) => {
+app.get('/write', 로그인필요, async (req, res) => {
   const allowedUsers = ['krogy', 'admin'];
   if (!allowedUsers.includes(req.session.user.username)) {
     return res.status(403).send('접근 권한이 없습니다.');
   }
-  res.render('write', { title: '정보 등록' });
+
+  // 🔽 최신 프로모션 데이터 1개 가져오기
+  const latest = await db.collection('promotions')
+    .find({ type: 'table' })
+    .sort({ createdAt: -1 })
+    .limit(1)
+    .toArray();
+
+  // 🔽 데이터 포맷 변경 (data 배열 형태)
+  let latestPromo = null;
+  if (latest.length > 0 && latest[0].content) {
+    latestPromo = {
+      createdAt: latest[0].createdAt,
+      data: Object.values(latest[0].content).map(row => {
+        const values = Object.values(row);
+        return {
+          name: values[0],
+          pay: values[1]
+        };
+      })
+    };
+  }
+
+  res.render('write', {
+    title: '정보 등록',
+    latestPromo
+  });
 });
+
 
 
 // 이름으로 유저 정보 조회 API
@@ -877,4 +904,61 @@ app.get('/accountTable', async (req, res) => {
     riderData: global.riderData || [],
     promos
   });
+});
+
+app.post('/save-promo-result', 로그인필요, async (req, res) => {
+  try {
+    const { date, data } = req.body;
+    const user = req.session.user;
+
+    await db.collection('promotion_results').insertOne({
+      date,
+      data,
+      createdAt: new Date(),
+      createdBy: user.username
+    });
+
+    res.json({ message: '프로모션 결과가 저장되었습니다.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: '저장 실패' });
+  }
+});
+
+app.get('/my-promoPage', 로그인필요, async (req, res) => {
+  const user = req.session.user;
+  const latestPromo = await db.collection('promotion_results').find().sort({ createdAt: -1 }).limit(1).toArray();
+  let allPromos = [];
+
+  if (['admin', 'krogy'].includes(user.username)) {
+    allPromos = await db.collection('promotion_results').find().sort({ createdAt: -1 }).toArray();
+  }
+
+  res.render('my-promoPage', {
+    title: '프로모션 결과 확인',
+    user,
+    latestPromo: latestPromo[0] || null,
+    allPromos
+  });
+});
+
+
+// 최신 프로모션 지급 결과 반환 API
+app.get('/latest-promo', async (req, res) => {
+  try {
+    const latest = await db.collection('promotion_results')
+      .find({})
+      .sort({ createdAt: -1 }) // 최신순 정렬
+      .limit(1)
+      .toArray();
+
+    if (!latest || latest.length === 0) {
+      return res.json({});
+    }
+
+    res.json(latest[0]); // { date, createdBy, data: [ {name, value, rank, pay}, ... ] }
+  } catch (err) {
+    console.error('❌ 최신 프로모션 데이터 조회 실패:', err);
+    res.status(500).json({ error: '서버 오류 발생' });
+  }
 });

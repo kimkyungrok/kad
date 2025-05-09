@@ -11,6 +11,7 @@
     </div>
     <div class="col-auto">
       <button type="submit" class="btn btn-primary">확인</button>
+      <button id="savePromoResult" class="btn btn-success">프로모션 결과 공지</button>
     </div>
   </form>
 </div>
@@ -39,70 +40,104 @@
 
 <!-- 지급액 자동 입력 스크립트 -->
 <script>
-    const promos = <%- JSON.stringify(promos || []) %>;
-  
-    document.getElementById('checkForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-  
-      const inputDate = document.getElementById('writtenDate').value;
-      if (!inputDate) return alert("작성일을 입력해주세요.");
-  
-      console.log('🟡 사용자 입력 날짜:', inputDate);
-      console.log('🟡 promos 배열:', promos);
-  
-      let matchedPromo = null;
-  
-      promos.forEach((promo, index) => {
-        const promoDate = new Date(promo.createdAt).toISOString().slice(0, 10);
-        const type = promo.type;
-  
-        console.log(`📄 [${index}] promoDate = ${promoDate}, type = ${type}`);
-        if (promoDate === inputDate && type === 'table') {
-          matchedPromo = promo;
-        }
-      });
-  
-      if (!matchedPromo) {
-        alert("해당 작성일의 표 형식 프로모션이 없습니다.");
-        return;
+  const promos = <%- JSON.stringify(promos || []) %>;
+
+  // 확인 버튼 이벤트
+  document.getElementById('checkForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const inputDate = document.getElementById('writtenDate').value;
+    if (!inputDate) return alert("작성일을 입력해주세요.");
+
+    console.log('🟡 사용자 입력 날짜:', inputDate);
+    console.log('🟡 promos 배열:', promos);
+
+    let matchedPromo = null;
+
+    promos.forEach((promo, index) => {
+      const promoDate = new Date(promo.createdAt).toISOString().slice(0, 10);
+      const type = promo.type;
+
+      console.log(`📄 [${index}] promoDate = ${promoDate}, type = ${type}`);
+      if (promoDate === inputDate && type === 'table') {
+        matchedPromo = promo;
       }
-  
-      alert(`✅ 프로모션 매칭됨:\n작성일: ${new Date(matchedPromo.createdAt).toISOString().slice(0, 10)}\n타입: ${matchedPromo.type}`);
-  
-      const promoTable = matchedPromo.content;
-      const rows = document.querySelectorAll('#riderTableBody tr');
-  
-      console.log('📋 프로모션 표 데이터:', promoTable);
-  
-      rows.forEach((row, i) => {
-        const rank = parseInt(row.getAttribute('data-rank'));
-        const rankLabel = `${rank}등`; // 예: "1등"
-        let amount = '';
-  
-        console.log(`🔍 Row ${i} 등수: ${rankLabel}`);
-  
-        if (rank >= 1 && rank <= 5) {
-          Object.values(promoTable).forEach((rowObj, idx) => {
-            const values = Object.values(rowObj);
-            const label = values[0]?.toString().trim();  // 등수 텍스트
-            const value = values[1];
-  
-            console.log(`  🔎 비교 ${idx}: label=${label}, value=${value}`);
-            if (label === rankLabel) {
-              amount = value;
-              console.log(`  ✅ 매칭됨: ${rankLabel} = ${value}`);
-            }
-          });
-  
-          const cell = row.querySelector('.payCell');
-          if (amount && cell) {
-            cell.innerText = amount;
-            console.log(`💰 지급액 입력 완료: ${amount}`);
-          } else {
-            console.warn(`⚠️ 지급액 없음 또는 셀 오류: Row ${i}, amount=${amount}, cell=`, cell);
-          }
-        }
-      });
     });
-  </script>
-  
+
+    if (!matchedPromo) {
+      alert("해당 작성일의 표 형식 프로모션이 없습니다.");
+      return;
+    }
+
+    alert(`✅ 프로모션 매칭됨:\n작성일: ${new Date(matchedPromo.createdAt).toISOString().slice(0, 10)}\n타입: ${matchedPromo.type}`);
+
+    const promoTable = matchedPromo.content;
+    const rows = document.querySelectorAll('#riderTableBody tr');
+
+    console.log('📋 프로모션 표 데이터:', promoTable);
+
+    rows.forEach((row, i) => {
+      const rank = parseInt(row.getAttribute('data-rank'));
+      const rankLabel = `${rank}등`;
+      let amount = '';
+
+      console.log(`🔍 Row ${i} 등수: ${rankLabel}`);
+
+      if (rank >= 1 && rank <= 5) {
+        Object.values(promoTable).forEach((rowObj, idx) => {
+          const values = Object.values(rowObj);
+          const label = values[0]?.toString().trim();
+          const value = values[1];
+
+          console.log(`  🔎 비교 ${idx}: label=${label}, value=${value}`);
+          if (label === rankLabel) {
+            amount = value;
+            console.log(`  ✅ 매칭됨: ${rankLabel} = ${value}`);
+          }
+        });
+
+        const cell = row.querySelector('.payCell');
+        if (amount && cell) {
+          cell.innerText = amount;
+          console.log(`💰 지급액 입력 완료: ${amount}`);
+        } else {
+          console.warn(`⚠️ 지급액 없음 또는 셀 오류: Row ${i}, amount=${amount}, cell=`, cell);
+        }
+      }
+    });
+  });
+
+  // 📢 프로모션 결과 공지 버튼 이벤트
+  document.getElementById('savePromoResult')?.addEventListener('click', () => {
+    const rows = Array.from(document.querySelectorAll('#riderTableBody tr')).map(row => {
+      return {
+        name: row.querySelector('td:nth-child(1)')?.innerText || '',
+        value: row.querySelector('td:nth-child(2)')?.innerText || '',
+        rank: row.querySelector('td:nth-child(3)')?.innerText || '',
+        pay: row.querySelector('.payCell')?.innerText || ''
+      };
+    });
+
+    const writtenDate = document.getElementById('writtenDate').value;
+
+    if (!writtenDate) {
+      alert('작성일을 입력해야 프로모션 결과를 공지할 수 있습니다.');
+      return;
+    }
+
+    fetch('/save-promo-result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: writtenDate, data: rows })
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || '저장 완료');
+      window.location.href = '/my-promoPage';
+    })
+    .catch(err => {
+      console.error('❌ 저장 실패:', err);
+      alert('서버 오류: 저장에 실패했습니다.');
+    });
+  });
+</script>

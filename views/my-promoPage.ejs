@@ -1,0 +1,112 @@
+<% layout('layout') %>
+
+<% if (latestPromo) { %>
+    <h4>📢 최근 프로모션 결과 (프로모션 공지일: <%= latestPromo.date %>)</h4>
+    <table class="table table-bordered">
+      <thead><tr><th>이름</th><th>정산 금액</th><th>등수</th><th>지급액</th></tr></thead>
+      <tbody>
+        <% latestPromo.data.forEach(item => { %>
+          <tr>
+            <td><%= item.name %></td>
+            <td><%= item.value %></td>
+            <td><%= item.rank %></td>
+            <td><%= item.pay %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  
+    <% const matched = latestPromo.data.find(x => x.name === user.name); %>
+    <% if (matched) { %>
+      <div class="mt-4">
+        <h5>🎉 나의 프로모션 지급 결과</h5>
+        <ul>
+          <li><strong>등수:</strong> <%= matched.rank %></li>
+          <li><strong>지급액:</strong> <%= matched.pay %></li>
+        </ul>
+      </div>
+    <% } else { %>
+      <p class="text-muted">⚠️ 현재 프로모션 결과에 해당 하지않습니다. ㅠ.ㅠ</p>
+    <% } %>
+  <% } else { %>
+    <p class="text-muted">📭 아직 저장된 프로모션 결과가 없습니다.</p>
+  <% } %>
+  
+  <% if (user.username === 'admin' || user.username === 'krogy') { %>
+    <h5 class="mt-5">🗂 이전 등록된 전체 결과</h5>
+    <ul id="promoHistoryList">
+      <% allPromos.forEach((p, idx) => { %>
+        <li>
+          <a href="#" class="promo-history-item" data-index="<%= idx %>">
+            <%= new Date(p.createdAt).toLocaleString('ko-KR') %> - <%= p.date %> (<%= p.createdBy %>)
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  
+    <script>
+      const promoHistoryData = <%- JSON.stringify(allPromos || []) %>;
+  
+      document.querySelectorAll('.promo-history-item').forEach(el => {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          const index = this.getAttribute('data-index');
+          const promo = promoHistoryData[index];
+          if (!promo || !promo.data) return;
+  
+          const modalInfo = document.getElementById('modalPromoInfo');
+          const modalTable = document.getElementById('modalPromoTableBody');
+  
+          modalInfo.innerHTML = `
+            <strong>📅 작성일:</strong> ${promo.date}<br>
+            <strong>👤 작성자:</strong> ${promo.createdBy}<br>
+            <strong>🕒 등록일:</strong> ${new Date(promo.createdAt).toLocaleString('ko-KR')}
+          `;
+  
+          modalTable.innerHTML = '';
+          promo.data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.name}</td>
+              <td>${item.value}</td>
+              <td>${item.rank}</td>
+              <td>${item.pay}</td>
+            `;
+            modalTable.appendChild(row);
+          });
+  
+          // 모달 열기
+          const modal = new bootstrap.Modal(document.getElementById('promoModal'));
+          modal.show();
+        });
+      });
+    </script>
+    <!-- 📦 모달창 (숨김 상태) -->
+<div class="modal fade" id="promoModal" tabindex="-1" aria-labelledby="promoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="promoModalLabel">이전 프로모션 상세</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body">
+          <div id="modalPromoInfo" class="mb-3"></div>
+          <table class="table table-bordered table-sm text-center">
+            <thead>
+              <tr>
+                <th>이름</th>
+                <th>정산 금액</th>
+                <th>등수</th>
+                <th>지급액</th>
+              </tr>
+            </thead>
+            <tbody id="modalPromoTableBody">
+              <!-- 내용이 JS로 채워집니다 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <% } %>
