@@ -1,13 +1,13 @@
 <% layout('layout') %>
 
 <div class="container mt-5">
-  <h2 class="mb-4">등록된 유저 목록</h2>
+  <h2 class="mb-4">등록 라이더</h2>
 
   <!-- 검색 및 필터 -->
   <div class="row mb-4">
     <div class="col-12 col-md-4 mb-2">
       <select id="branchFilter" class="form-select">
-        <option value="">가입 지사 선택 (전체)</option>
+        <option value="">전체 지사</option>
         <% const branches = [...new Set(users.map(u => u.branch))]; branches.forEach(branch => { %>
           <option value="<%= branch %>"><%= branch %></option>
         <% }) %>
