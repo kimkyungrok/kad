@@ -962,3 +962,23 @@ app.get('/latest-promo', async (req, res) => {
     res.status(500).json({ error: '서버 오류 발생' });
   }
 });
+
+app.delete('/promo-result/:id', 로그인필요, async (req, res) => {
+  const user = req.session.user;
+  if (!['admin', 'krogy'].includes(user?.username)) {
+    return res.status(403).json({ message: '접근 권한 없음' });
+  }
+
+  try {
+    const id = req.params.id;
+    const result = await db.collection('promotion_results').deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 1) {
+      return res.json({ message: '삭제되었습니다.' });
+    } else {
+      return res.status(404).json({ message: '대상을 찾을 수 없습니다.' });
+    }
+  } catch (err) {
+    console.error('삭제 실패:', err);
+    res.status(500).json({ message: '서버 오류' });
+  }
+});

@@ -64,13 +64,11 @@
 
       <!-- 동적 테이블 입력 영역 -->
       <div id="dynamicTableContainer" class="table-responsive d-none mt-3"></div>
-      
     </div>
 
     <div class="text-end">
       <button type="submit" class="btn btn-primary">저장</button>
     </div>
-    <input type="hidden" name="createdAt" id="createdAt">
   </form>
 </div>
 
@@ -80,7 +78,6 @@
     document.getElementById('textInputGroup').classList.add('d-none');
     document.getElementById('tableSetupGroup').classList.add('d-none');
     document.getElementById('dynamicTableContainer').classList.add('d-none');
-    document.getElementById('createdAt').value = new Date().toISOString();
 
     if (type === 'text') {
       document.getElementById('textInputGroup').classList.remove('d-none');

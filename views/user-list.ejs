@@ -22,7 +22,8 @@
   </div>
 
   <% if (users.length > 0) { %>
-    <div class="table-responsive">
+    <!-- 데스크탑 테이블 -->
+    <div class="table-responsive d-none d-md-block">
       <table class="table table-striped align-middle text-center" id="userTable">
         <thead class="table-light">
           <tr>
@@ -57,6 +58,27 @@
         </tbody>
       </table>
     </div>
+
+    <!-- 모바일 카드 -->
+    <div class="d-block d-md-none" id="mobileCardList">
+      <% users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(user => { %>
+        <div class="card mb-3 user-card">
+          <div class="card-body">
+            <h5 class="card-title"><%= user.name %> (<%= user.username %>)</h5>
+            <p><strong>배민커넥트 ID:</strong> <%= user.connectId %></p>
+            <p><strong>전화번호:</strong> <%= user.phone %></p>
+            <p><strong>가입 지사:</strong> <%= user.branch %></p>
+            <p><strong>가입일:</strong> <%= new Date(user.createdAt).toLocaleDateString('ko-KR') %></p>
+            <div class="d-flex gap-2 mt-2">
+              <a href="/edit-user/<%= user._id %>" class="btn btn-sm btn-warning w-50">수정</a>
+              <form action="/delete-user/<%= user._id %>" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?')" class="w-50">
+                <button type="submit" class="btn btn-sm btn-danger w-100">삭제</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
   <% } else { %>
     <p>등록된 유저가 없습니다.</p>
   <% } %>
@@ -68,47 +90,65 @@
 
 <!-- 필터 JS -->
 <script>
-const searchInput = document.getElementById('searchInput');
-const branchFilter = document.getElementById('branchFilter');
-const tableBody = document.getElementById('userTableBody');
+  const searchInput = document.getElementById('searchInput');
+  const branchFilter = document.getElementById('branchFilter');
 
-searchInput.addEventListener('input', filterTable);
-branchFilter.addEventListener('change', filterTable);
+  searchInput.addEventListener('input', filterAll);
+  branchFilter.addEventListener('change', filterAll);
 
-function filterTable() {
-  const searchText = searchInput.value.toLowerCase();
-  const selectedBranch = branchFilter.value;
-  const rows = tableBody.querySelectorAll('tr');
+  function filterAll() {
+    const searchText = searchInput.value.toLowerCase();
+    const selectedBranch = branchFilter.value;
 
-  rows.forEach(row => {
-    const username = row.children[0].textContent.toLowerCase();
-    const name = row.children[1].textContent.toLowerCase();
-    const branch = row.children[4].textContent;
+    // 테이블
+    document.querySelectorAll('#userTableBody tr').forEach(row => {
+      const username = row.children[0].textContent.toLowerCase();
+      const name = row.children[1].textContent.toLowerCase();
+      const branch = row.children[4].textContent;
+      const visible = (!selectedBranch || branch === selectedBranch) &&
+                      (username.includes(searchText) || name.includes(searchText));
+      row.style.display = visible ? '' : 'none';
+    });
 
-    const matchesSearch = username.includes(searchText) || name.includes(searchText);
-    const matchesBranch = !selectedBranch || branch === selectedBranch;
+    // 카드
+    document.querySelectorAll('#mobileCardList .user-card').forEach(card => {
+      const nameLine = card.querySelector('.card-title').textContent;
+      const name = nameLine.split('(')[0].trim().toLowerCase();
+      const username = nameLine.split('(')[1].replace(')', '').toLowerCase();
+      const branch = card.querySelector('p:nth-of-type(3)').textContent.replace('가입 지사:', '').trim();
+      const visible = (!selectedBranch || branch === selectedBranch) &&
+                      (username.includes(searchText) || name.includes(searchText));
+      card.style.display = visible ? '' : 'none';
+    });
+  }
 
-    row.style.display = (matchesSearch && matchesBranch) ? '' : 'none';
-  });
-}
-
-function resetFilters() {
-  searchInput.value = '';
-  branchFilter.value = '';
-  filterTable();
-}
+  function resetFilters() {
+    searchInput.value = '';
+    branchFilter.value = '';
+    filterAll();
+  }
 </script>
 
-<!-- 모바일 스타일 -->
+<!-- 모바일 최적화 -->
 <style>
-@media (max-width: 576px) {
-  .table th, .table td {
-    font-size: 13px;
-    padding: 8px;
+  @media (max-width: 576px) {
+    .table th, .table td {
+      font-size: 13px;
+      padding: 8px;
+    }
+    .btn-sm {
+      font-size: 13px;
+      padding: 6px 10px;
+    }
+    .form-select, .form-control, .btn {
+      font-size: 14px;
+    }
+    .card-title {
+      font-size: 16px;
+    }
+    .user-card p {
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
   }
-  .btn-sm {
-    font-size: 13px;
-    padding: 6px 10px;
-  }
-}
 </style>
