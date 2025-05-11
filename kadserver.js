@@ -232,7 +232,7 @@ app.get('/my-posts', 로그인필요, async (req, res) => {
 
     let filter = {};
     let allUsers = [];
-    const isAdmin = ['krogy', 'admin'].includes(currentUser.username);
+    //const isAdmin = ['krogy', 'admin'].includes(currentUser.username);
 
     if (isAdmin) {
       // 관리자: 조건부 검색 필터 적용
@@ -607,12 +607,7 @@ const storage = multer.diskStorage({
 });
 
 // 업로드 라우터
-app.post(
-  '/upload-welcome-image',
-  로그인필요,
-  isAdmin,
-  upload.single('welcomeImage'),
-  async (req, res) => {
+app.post('/upload-welcome-image',로그인필요, isAdmin,upload.single('welcomeImage'),async (req, res) => {
     try {
       const uploadedImagePath = '/uploads/' + req.file.filename;
 
@@ -1044,4 +1039,8 @@ app.post('/reject-user/:id', async (req, res) => {
   const db = req.app.locals.db;
   await db.collection('users').deleteOne({ _id: new ObjectId(req.params.id) });
   res.redirect('/admin-pending');
+});
+
+app.get('/ScoreTable', (req, res) => {
+    res.render('ScoreTable'); // 'ScoreTable.ejs' 파일 렌더링
 });

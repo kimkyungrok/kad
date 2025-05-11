@@ -1,0 +1,596 @@
+<% layout('layout') %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>페이지 제목</title>
+    <style>
+        /* 화면을 두 부분으로 나누는 스타일 */
+        .split-screen {
+            display: flex;
+            height: 100vh;  /* 전체 화면 크기 */
+        }
+
+        /* 상단 고정 네비게이션 */
+        .top-nav {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            height: 20px; /* 고정된 네비게이션 바의 높이 지정 */
+        }
+
+        /* 왼쪽 네비게이션 바 */
+        .sidebar {
+            width: 250px;
+            background-color: #f8f9fa;
+            position: fixed;
+            height: 100%;
+            top: 10px;  /* 네비게이션 바 높이만큼 여백을 두어야 함 */
+            left: 0;
+            padding: 20px;
+            box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        /* 네비게이션 링크 스타일 */
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .sidebar a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* 오른쪽 콘텐츠 */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-top: 70px; /* 상단 네비게이션 높이만큼 여백을 추가 */
+        }
+
+        /* 페이지 나누기 */
+        .page-section {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 고정 네비게이션 바 -->
+
+
+    <!-- 화면을 두 부분으로 나누는 레이아웃 -->
+    <div class="split-screen">
+        <!-- 왼쪽 네비게이션 바 -->
+        <div class="sidebar">
+            <h5>메뉴</h5>
+            <a id="calculateButton" class="btn btn-primary">달성 점수 계산</a>
+            
+        </div>
+
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<title>스코어 테이블</title>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">스코어 테이블</h2>
+
+        <!-- 7개의 그룹을 2열로 배치 -->
+        <div class="row">
+            <!-- 그룹 1 -->
+            <div class="col-12 col-sm-6 mb-4">
+                <h4 class="text-center">수요일</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                                <th class="text-center">요일</th>
+                                <th class="text-center">시간대</th>
+                                <th class="text-center">목표 수행량</th>
+                                <th class="text-center">실제 수행량</th>
+                                <th class="text-center">달성 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" rowspan="6">수요일</td>
+                                <td class="text-center">오전/점심 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Wednesdaytg1" value="21" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayCnt1" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayValue1" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">오후 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Wednesdaytg2" value="20"></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayCnt2" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayValue2" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">저녁 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Wednesdaytg3" value="30"></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayCnt3" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayValue3" value="" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">심야 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Wednesdaytg4" value="29"></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayCnt4" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayValue4" value="" readonly></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-center">거절</td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayDenied" value=""></td>
+                                <td class="text-center">배차 취소</td>
+                                <td class="text-center"><input type="text" class="form-control" name="WednesdayCancel" value=""></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">일 점수</td>
+                                <td colspan="2"><input type="text" class="form-control" name="WednesdayTotal" value=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 그룹 2 -->
+            <div class="col-12 col-sm-6 mb-4">
+                <h4 class="text-center">목요일</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                                <th class="text-center">요일</th>
+                                <th class="text-center">시간대</th>
+                                <th class="text-center">목표 수행량</th>
+                                <th class="text-center">실제 수행량</th>
+                                <th class="text-center">달성 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" rowspan="6">목요일</td>
+                                <td class="text-center">오전/점심 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Thursdaytg1" value="21" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayCnt1" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayValue1" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">오후 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Thursdaytg2" value="20"></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayCnt2" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayValue2" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">저녁 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Thursdaytg3" value="30"></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayCnt3" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayValue3" value="" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">심야 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Thursdaytg4" value="29"></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayCnt4" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayValue4" value="" readonly></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-center">거절</td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayDenied" value=""></td>
+                                <td class="text-center">배차 취소</td>
+                                <td class="text-center"><input type="text" class="form-control" name="ThursdayCancel" value=""></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">일 점수</td>
+                                <td colspan="2"><input type="text" class="form-control" name="ThursdayTotal" value=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+                 <div class="row">
+            <!-- 그룹 1 -->
+            <div class="col-12 col-sm-6 mb-4">
+                <h4 class="text-center">금요일</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">요일</th>
+                                <th class="text-center">시간대</th>
+                                <th class="text-center">목표 수행량</th>
+                                <th class="text-center">실제 수행량</th>
+                                <th class="text-center">달성 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="6">금요일</td>
+                                <td class="text-center">오전/점심 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Fridaytg1" value="24" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayCnt1" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayValue1" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">오후 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Fridaytg2" value="21" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayCnt2" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayValue2" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">저녁 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Fridaytg3" value="32" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayCnt3" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayValue3" value="" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">심야 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Fridaytg4" value="33" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayCnt4" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayValue4" value="" readonly></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-center">거절</td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayDeined" value=""></td>
+                                <td class="text-center">배차 취소</td>
+                                <td class="text-center"><input type="text" class="form-control" name="FridayCancel" value=""></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">일 점수</td>
+                                <td colspan="2"><input type="text" class="form-control" name="FridayTotal" value=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 그룹 2 -->
+            <div class="col-12 col-sm-6 mb-4">
+                <h4 class="text-center">토요일</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">요일</th>
+                                <th class="text-center">시간대</th>
+                                <th class="text-center">목표 수행량</th>
+                                <th class="text-center">실제 수행량</th>
+                                <th class="text-center">달성 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="6">토요일</td>
+                                <td class="text-center">오전/점심 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Saturdaytg1" value="31" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayCnt1" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayValue1" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">오후 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Saturdaytg2" value="22" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayCnt2" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayValue2" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">저녁 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Saturdaytg3" value="36" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayCnt3" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayValue3" value="" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">심야 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Saturdaytg4" value="31" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayCnt4" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayValue4" value="" readonly></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-center">거절</td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayDenied" value=""></td>
+                                <td class="text-center">배차 취소</td>
+                                <td class="text-center"><input type="text" class="form-control" name="SaturdayCancel" value=""></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">일 점수</td>
+                                <td colspan="2"><input type="text" class="form-control" name="SaturdayTotal" value=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+      <div class="row">
+            <!-- 그룹 1 -->
+            <div class="col-12 col-sm-6 mb-4">
+                <h4 class="text-center">일요일</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">요일</th>
+                                <th class="text-center">시간대</th>
+                                <th class="text-center">목표 수행량</th>
+                                <th class="text-center">실제 수행량</th>
+                                <th class="text-center">달성 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="6">일요일</td>
+                                <td class="text-center">오전/점심 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Sundaytg1" value="33" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayCnt1" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayValue1" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">오후 </td>
+                                <<td class="text-center"><input type="text" class="form-control" name="Sundaytg2" value="22" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayCnt2" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayValue2" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">저녁 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Sundaytg3" value="35" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayCnt3" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayValue3" value="" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">심야 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Sundaytg4" value="30" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayCnt4" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayValue4" value="" readonly></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-center">거절</td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayDenied" value=""></td>
+                                <td class="text-center">배차 취소</td>
+                                <td class="text-center"><input type="text" class="form-control" name="SundayCancel" value=""></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">일 점수</td>
+                                <td colspan="2"><input type="text" class="form-control" name="SundayTotal" value=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 그룹 2 -->
+            <div class="col-12 col-sm-6 mb-4">
+                <h4 class="text-center">월요일</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">요일</th>
+                                <th class="text-center">시간대</th>
+                                <th class="text-center">목표 수행량</th>
+                                <th class="text-center">실제 수행량</th>
+                                <th class="text-center">달성 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="6">월요일</td>
+                                <td class="text-center">오전/점심 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Mondaytg1" value="21" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayCnt1" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayValue1" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">오후 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Mondaytg2" value="20" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayCnt2" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayValue2" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">저녁 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Mondaytg3" value="30" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayCnt3" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayValue3" value="" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">심야 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Mondaytg4" value="29" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayCnt4" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayValue4" value="" readonly></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-center">거절</td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayDenied" value=""></td>
+                                <td class="text-center">배차 취소</td>
+                                <td class="text-center"><input type="text" class="form-control" name="MondayCancel" value=""></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">일 점수</td>
+                                <td colspan="2"><input type="text" class="form-control" name="MondayTotal" value=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+      <div class="row">
+            <!-- 그룹 1 -->
+            <div class="col-12 col-sm-6 mb-4">
+                <h4 class="text-center">화요일</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">요일</th>
+                                <th class="text-center">시간대</th>
+                                <th class="text-center">목표 수행량</th>
+                                <th class="text-center">실제 수행량</th>
+                                <th class="text-center">달성 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="6">화요일</td>
+                                <td class="text-center">오전/점심 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Tuesdaytg1" value="21" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayCnt1" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayValue1" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">오후 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Tuesdaytg2" value="20" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayCnt2" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayValue2" value="" readonly></td>
+                            </tr>
+                            <tr>                        
+                                <td class="text-center">저녁 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Tuesdaytg3" value="30" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayCnt3" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayValue3" value="" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">심야 </td>
+                                <td class="text-center"><input type="text" class="form-control" name="Tuesdaytg4" value="29" readonly></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayCnt4" value=""></td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayValue4" value="" readonly></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-center">거절</td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayDenied" value=""></td>
+                                <td class="text-center">배차 취소</td>
+                                <td class="text-center"><input type="text" class="form-control" name="TuesdayCancel" value=""></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">일 점수</td>
+                                <td colspan="2"><input type="text" class="form-control" name="TuesdayTotal" value=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 버튼 클릭 시 달성 점수 계산
+    document.getElementById("calculateButton").addEventListener("click", function() {
+        // 수요일 그룹 계산
+        calculateDailyScore('Wednesday');
+        // 목요일 그룹 계산
+        calculateDailyScore('Thursday');
+        // 금요일 그룹 계산
+        calculateDailyScore('Friday');
+        // 나머지 그룹 계산 (토요일, 일요일, 월요일, 화요일)
+        calculateDailyScore('Saturday');
+        calculateDailyScore('Sunday');
+        calculateDailyScore('Monday');
+        calculateDailyScore('Tuesday');
+    });
+
+    function calculateDailyScore(day) {
+        let totalScore = 0;
+
+        for (let i = 1; i <= 5; i++) { // 5개의 그룹(행) 처리
+            let goalElement = document.querySelector(`input[name="${day}tg${i}"]`); // 목표 수행량
+            let actualElement = document.querySelector(`input[name="${day}Cnt${i}"]`); // 실제 수행량
+            let scoreCell = document.querySelector(`input[name="${day}Value${i}"]`); // 달성 점수 입력 칸
+
+            if (goalElement && actualElement && scoreCell) {
+                let goal = goalElement.value; // 목표 수행량
+                let actual = actualElement.value; // 실제 수행량
+
+                // 디버깅용: 값 확인
+                console.log(`${day} - Row ${i}: 목표 = ${goal}, 실제 = ${actual}`);
+
+                // 금요일, 토요일, 일요일에 대한 점수 설정
+                if (day === 'Friday') {
+                    if (i === 1) {
+                        scoreCell.value = "2";
+                        totalScore += 2;
+                    } else if (i === 2) {
+                        scoreCell.value = "2";
+                        totalScore += 2;
+                    } else if (i === 3) {
+                        scoreCell.value = "3";
+                        totalScore += 3;
+                    } else if (i === 4) {
+                        scoreCell.value = "2";
+                        totalScore += 2;
+                    }
+                } else if (day === 'Saturday') {
+                    if (i === 1) {
+                        scoreCell.value = "3";
+                        totalScore += 3;
+                    } else if (i === 2) {
+                        scoreCell.value = "2";
+                        totalScore += 2;
+                    } else if (i === 3) {
+                        scoreCell.value = "3";
+                        totalScore += 3;
+                    } else if (i === 4) {
+                        scoreCell.value = "2";
+                        totalScore += 2;
+                    }
+                } else if (day === 'Sunday') {
+                    if (i === 1) {
+                        scoreCell.value = "3";
+                        totalScore += 3;
+                    } else if (i === 2) {
+                        scoreCell.value = "2";
+                        totalScore += 2;
+                    } else if (i === 3) {
+                        scoreCell.value = "3";
+                        totalScore += 3;
+                    } else if (i === 4) {
+                        scoreCell.value = "1";
+                        totalScore += 1;
+                    }
+                } else {
+                    // 기존 로직 (수요일, 목요일, 월요일, 화요일)
+                    if (parseInt(actual) >= parseInt(goal)) {
+                        if (i === 1) {
+                            scoreCell.value = "2";
+                            totalScore += 2;
+                        } else if (i === 2) {
+                            scoreCell.value = "2";
+                            totalScore += 2;
+                        } else if (i === 3) {
+                            scoreCell.value = "3";
+                            totalScore += 3;
+                        } else if (i === 4) {
+                            scoreCell.value = "1";
+                            totalScore += 1;
+                        }
+                    } else {
+                        scoreCell.value = "0"; // 목표 수행량보다 적을 경우 0점
+                    }
+                }
+            } else {
+                console.error(`Row ${i} 요소를 찾을 수 없습니다: ${day}tg${i}, ${day}Cnt${i}, ${day}Value${i}`);
+            }
+        }
+
+        // 각 요일별 총합을 업데이트
+        document.querySelector(`input[name="${day}Total"]`).value = totalScore;
+    }
+</script>
+
+
+    
+</body>
+</html>
