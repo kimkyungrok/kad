@@ -1,7 +1,4 @@
 <% layout('layout') %>
-<head>
-  <title>정산서 등록</title>
-</head>
 
 <body>
 <div class="container mt-5">
@@ -202,14 +199,6 @@
           <td colspan="2" class="text-center">정산 종료일</td>
           <td><input type="text" name="settlementEnd" class="form-control" required></td>
         </tr>
-        <tr>
-          <td colspan="2" class="text-center">정산 지급일</td>
-          <td><input type="date" name="payDay" min="2025-01-01" max="2099-12-31" class="form-control" required></td>
-        </tr>
-        <tr>
-          <td colspan="2" class="text-center">정산서 작성일</td>
-          <td><input type="text" name="statementPaper" class="form-control" required></td>
-        </tr>
       </table>
     </div>
     <div class="text-center mt-2">
@@ -359,58 +348,67 @@
     }
   }
 
-  function performFinancialCalculations() {
-    const get = name => {
-      const val = document.querySelector(`input[name="${name}"]`)?.value.replace(/[^\d\-\.]/g, '') || '0';
-      const parsed = parseFloat(val);
-      return Object.is(parsed, -0) ? 0 : parsed;
-    };
-  
-    const round = n => Math.round(n);
-  
-    const H = get('riderFinalPaymentH');
-    const taxFee = get('taxFee');
-    const ownerFee = get('ownerInsuranceFee');
-    const withholding = get('withholdingTax');
-    const promoPay = get('finalPromoPayment');
-    const fuelSupport = get('fuelSupport');
-  
-    const setStatus = document.querySelector('input[name="setAchievement"]')?.value.trim();
-    if (setStatus === '성공') {
-      A = H - withholding;
-      C = promoPay + fuelSupport;
-    } else if (setStatus === '실패') {
-      A = H - withholding - taxFee - ownerFee;
-      C = promoPay + fuelSupport;
-    } else {
-      console.warn("❗ setStatus 값이 예상과 다름:", setStatus);
-    }
-  
-    const B = 0;
-    const total = A + B + C;
-  
-    console.log('💬 계산 상태');
-    console.log('H:', H);
-    console.log('withholding:', withholding);
-    console.log('taxFee:', taxFee);
-    console.log('ownerFee:', ownerFee);
-    console.log('promoPay:', promoPay);
-    console.log('fuelSupport:', fuelSupport);
-    console.log('A:', A);
-    console.log('C:', C);
-  
-    const supportCField = document.querySelector('input[name="supportC"]');
-    if (!supportCField) {
-      console.error('❌ supportC 입력 필드 없음!');
-    } else {
-      supportCField.value = round(C);
-      console.log('✅ supportC 값 입력 완료:', round(C));
-    }
-  
-    document.querySelector('input[name="paymentA"]').value = round(A);
-    document.querySelector('input[name="refundB"]').value = round(B);
-    document.querySelector('input[name="finalPayment"]').value = round(total);
+function performFinancialCalculations() {
+  const get = name => {
+    const val = document.querySelector(`input[name="${name}"]`)?.value.replace(/[^\d\-\.]/g, '') || '0';
+    const parsed = parseFloat(val);
+    return Object.is(parsed, -0) ? 0 : parsed;
+  };
+
+  const round = n => Math.round(n);
+
+  const H = get('riderFinalPaymentH');
+  const taxFee = get('taxFee');
+  const ownerFee = get('ownerInsuranceFee');
+  const withholding = get('withholdingTax');
+  const promoPay = get('finalPromoPayment');
+
+  let fuelSupport = get('fuelSupport'); // 기본 값 가져오기
+
+  const setStatus = document.querySelector('input[name="setAchievement"]')?.value.trim();
+  let A = 0, C = 0;
+
+  if (setStatus === '성공') {
+    A = H - withholding;
+    C = promoPay + fuelSupport;
+  } else if (setStatus === '실패') {
+    // ❗ 실패 시 fuelSupport 무조건 0 처리
+    fuelSupport = 0;
+    const fuelSupportInput = document.querySelector('input[name="fuelSupport"]');
+    if (fuelSupportInput) fuelSupportInput.value = '0원'; // 직접 표시까지 수정
+
+    A = H - withholding - taxFee - ownerFee;
+    C = promoPay + fuelSupport;
+  } else {
+    console.warn("❗ setStatus 값이 예상과 다름:", setStatus);
   }
+
+  const B = 0;
+  const total = A + B + C;
+
+  console.log('💬 계산 상태');
+  console.log('H:', H);
+  console.log('withholding:', withholding);
+  console.log('taxFee:', taxFee);
+  console.log('ownerFee:', ownerFee);
+  console.log('promoPay:', promoPay);
+  console.log('fuelSupport:', fuelSupport);
+  console.log('A:', A);
+  console.log('C:', C);
+
+  const supportCField = document.querySelector('input[name="supportC"]');
+  if (!supportCField) {
+    console.error('❌ supportC 입력 필드 없음!');
+  } else {
+    supportCField.value = round(C);
+    console.log('✅ supportC 값 입력 완료:', round(C));
+  }
+
+  document.querySelector('input[name="paymentA"]').value = round(A);
+  document.querySelector('input[name="refundB"]').value = round(B);
+  document.querySelector('input[name="finalPayment"]').value = round(total);
+}
+
   
 
   function formatCurrencyFields() {
@@ -462,4 +460,8 @@
     if (value.length > 6) value = value.slice(0, 6) + '-' + value.slice(6);
     e.target.value = value;
   });
+
+
+
+  
 </script>

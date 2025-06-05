@@ -2,96 +2,120 @@
 
 <div class="container mt-5">
   <div class="border rounded p-4 mb-4">
-    <h4 class="mb-2 text-center">정산 내역서</h4>
-    <h5 class="mb-4 text-center">작성일: <%= post.title %></h5>
+    <h4 class="mb-2 text-center"> <%= post.riderName %> (<%= post.branch %>) 정산 내역서</h4>
+    <h6 class="mb-4 text-center">작성일: <%= post.title %></h6>
     <div class="table-responsive">
-      <table class="table table-bordered table-sm fs-6 text-center align-middle">
+      <table class="table table-bordered table-sm fs-5 text-center align-middle"  style="border: 1px solid #646464;" >
         <colgroup>
-          <col style="width: 20%;">
-          <col style="width: 30%;">
-          <col style="width: 20%;">
-          <col style="width: 30%;">
+          <col style="width: 50mm;">
+          <col style="width: 50mm;">
+          <col style="width: 50mm;">
+          <col style="width: 50mm;">
         </colgroup>
 
         <!-- 라이더 정보 -->
         <tr>
+          <td colspan="4" style="height: 5px; background-color: #646464;"></td>
+        </tr>
+        <tr>
           </td><td colspan="2">정산 지급 예정일</td><td colspan="2"><%= post.payDay %></td>
         </tr>
-        <tr class="table-secondary">
-          <th colspan="4" class="bg-light text-center">라이더 정보</th>
+
+        <tr>
+          <td colspan="4" style="height: 5px; background-color: #646464;"></td>
+        </tr>
+
+        <tr class="table-secondary" style="border: 1px solid #646464;" >
+          <th colspan="4" class="text-center"  style="background-color: #b9b9b9;">라이더 정보</th>
+        </tr>
+        <tr style="border: 1px solid #646464;" >
+          <td style="background-color: #e2e2e2;" class="text-middle">라이더 명</td><td class="text-break text-middle"><%= post.riderName %></td>
+          <td style="background-color: #e2e2e2;" class="text-middle">수행 건수</td><td class="text-break text-middle"><%= post.taskCount %></td>
         </tr>
         <tr>
-          <td style="background-color: #cdcdcd;"class="text-middle">라이더 명</td><td class="text-break text-middle"><%= post.riderName %></td>
-          <td style="background-color: #cdcdcd;"class="text-middle">수행 건수</td><td class="text-break text-middle"><%= post.taskCount %></td>
+          <td style="background-color: #e2e2e2;"class="text-middle">주민번호</td><td class="text-break text-middle" colspan="3"><%= post.residentId %></td>
         </tr>
         <tr>
-          <td style="background-color: #cdcdcd;"class="text-middle">주민번호</td><td class="text-break text-middle" colspan="3"><%= post.residentId %></td>
+          <td style="background-color: #e2e2e2;"class="text-middle">은행명</td><td class="text-break text-middle"><%= user.bankName %></td>
+          <td style="background-color: #e2e2e2;"class="text-middle">예금주</td><td class="text-break text-middle" colspan="3"><%= post.depositAccount %></td>
         </tr>
         <tr>
-          <td style="background-color: #cdcdcd;"class="text-middle">은행명</td><td class="text-break text-middle"><%= user.bankName %></td>
-          <td style="background-color: #cdcdcd;"class="text-middle">예금주</td><td class="text-break text-middle" colspan="3"><%= post.depositAccount %></td>
-        </tr>
+          <td style="background-color: #e2e2e2;"class="text-middle"">계좌 번호</td><td colspan="3" class="text-break text-middle"><%= post.accountNumber %></td>
+        </tr> 
+
         <tr>
-          <td style="background-color: #cdcdcd;"class="text-middle"">계좌 번호</td><td colspan="3" class="text-break text-middle"><%= post.accountNumber %></td>
+          <td colspan="4" style="height: 5px; background-color: #646464;"></td>
         </tr>
 
         <!-- 배달료 기준 내역 -->
-        <tr class="table-secondary">
-          <th colspan="4" class="bg-light text-center">배달료 기준 내역</th>
+        <tr class="table-secondary" style="border: 1px solid #646464;" >
+          <th colspan="4" class="text-center"  style="background-color: #b9b9b9;">배달료 기준 내역</th>
         </tr>
         <tr>
-          <td colspan="2" class="bg-success-subtle">배달료 A</td><td colspan="2"><%= post.deliveryFeeA %></td>
+          <td colspan="2" style="background-color: #e2e2e2;">배달료 A</td><td colspan="2"><%= post.deliveryFeeA %></td>
         </tr>
         <tr>
-          <td colspan="2"  class="bg-success-subtle">추가지급 B</td><td colspan="2"><%= post.additionalPaymentB %></td>
+          <td colspan="2"  style="background-color: #e2e2e2;">추가지급 B</td><td colspan="2"><%= post.additionalPaymentB %></td>
         </tr>
         <tr>
-          <td colspan="2"  class="bg-success-subtle" colspan="2">총 배달료 C(A+B)</td><td colspan="2"><%= post.totalDeliveryFeeC %></td>
+          <td colspan="2"  style="background-color: #e2e2e2;" colspan="2">총 배달료 C(A+B)</td><td colspan="2"><%= post.totalDeliveryFeeC %></td>
         </tr>
         <tr>
-          <td class="bg-info-subtle">필요경비</td><td><%= post.necessaryExpense %></td>
-          <td class="bg-primary-subtle">라이더부담 고용보험료</td><td><%= post.riderEmploymentInsurance %></td>
+          <td style="background-color: #e2e2e2;">필요경비</td><td><%= post.necessaryExpense %></td>
+          <td style="background-color: #e2e2e2;">라이더부담 고용보험료</td><td><%= post.riderEmploymentInsurance %></td>
         </tr>
         <tr>
-          <td class="bg-info-subtle">보수액</td><td><%= post.paymentAmount %></td>
-          <td class="bg-primary-subtle">라이더부담 산재보험료</td><td><%= post.riderIndustrialInsurance %></td>
+          <td style="background-color: #e2e2e2;">보수액</td><td><%= post.paymentAmount %></td>
+          <td style="background-color: #e2e2e2;">라이더부담 산재보험료</td><td><%= post.riderIndustrialInsurance %></td>
         </tr>
         <tr>
-          <td colspan="2"style="background-color: #b5b5b5;">산재보험 소급정산</td>
+          <td colspan="2" style="background-color: #e2e2e2;">산재보험 소급정산</td>
           <td colspan="2"><%= post.riderRetroIndustrial %></td>
         </tr>
         <tr>
-          <td colspan="2" style="background-color: #b5b5b5;">고용보험 소급정산</td>
+          <td colspan="2" style="background-color: #e2e2e2;">고용보험 소급정산</td>
           <td colspan="2"><%= post.riderRetroEmployment %></td>
         </tr>
         <tr>
-          <td colspan="2" style="background-color: #74f2fb;">시간제보험료</td>
+          <td colspan="2" style="background-color: #e2e2e2;">시간제보험료</td>
           <td colspan="2"><%= post.insuranceFee %></td>
         </tr>
         
         <tr>
-          <td class="bg-danger-subtle">라이더별 정산금액</td><td colspan="3"><%= post.riderFinalPaymentH %></td>
+          <td colspan="2" class="g-danger-subtle">라이더별 정산금액</td><td colspan="2"><%= post.riderFinalPaymentH %></td>
+        </tr>
+        
+        <tr>
+          <td colspan="4" style="height: 5px; background-color: #646464;"></td>
         </tr>
 
         <!-- 기본 공제 항목 -->
-        <tr class="table-secondary">
-          <th colspan="4" class="bg-light text-center">기본 공제 항목</th>
+        <tr class="table-secondary" style="border: 1px solid #646464;" >
+          <th colspan="4" class="text-center" style="background-color: #b9b9b9;">기본 공제 항목</th>
         </tr>
         <tr>
-          <td style="background-color: #ffa8d9;">소득세</td><td><%= post.incomeTax %></td>
-          <td style="background-color: #ffa8d9;">주민세</td><td><%= post.residentTax %></td>
+          <td style="background-color: #e2e2e2;">소득세</td><td><%= post.incomeTax %></td>
+          <td style="background-color: #e2e2e2;">주민세</td><td><%= post.residentTax %></td>
         </tr>
         <tr>
-          <td colspan="2" style="background-color: #ffa8d9;">원천 징수 세액<br><small>(소득세 + 주민세)</small></td>
+          <td colspan="2" style="background-color: #e2e2e2;">원천 징수 세액<br><small>(소득세 + 주민세)</small></td>
           <td colspan="2"><%= post.withholdingTax %></td>
+        </tr>
+        
+        <tr>
+          <td colspan="4" style="
+            height: 5px;
+            border: none !important;
+            background-color: #646464;
+          "></td>
         </tr>
 
         <!-- 세트 달성 여부 -->
-        <tr class="table-secondary">
-          <th colspan="4" class="bg-light text-center">세트 달성 여부에 따른 공제 항목<br><small>(세트 성공시 면제)</small></th>
+        <tr class="table-secondary" style="border: 1px solid #646464;" >
+          <th colspan="4" class="text-center" style="background-color: #eaa2a2;">세트 달성 여부에 따른 공제 항목<br><small>(세트 성공시 면제)</small></th>
         </tr>
         <tr>
-          <td colspan="2" style="background-color: #beaaff;">세트 달성 여부</td>
+          <td colspan="2" style="background-color: #fdc3c3;">세트 달성 여부</td>
           <td colspan="2">
             <% if (post.setAchievement === '성공') { %>
               <span style="color: blue;"><%= post.setAchievement %></span>
@@ -103,7 +127,7 @@
           </td>
         </tr>
         <tr>
-          <td colspan="2" class="bg-info">세무기장료</td>
+          <td colspan="2"  style="background-color: #fdc3c3;">세무기장료</td>
           <td colspan="2">
             <% if (post.setAchievement === '실패') { %>
               <span style="color: red;"><%= post.taxFee %></span>
@@ -113,7 +137,7 @@
           </td>
         </tr>
         <tr>
-          <td class="bg-info" colspan="2">사업주 부담 고용/산재 보험료</td>
+          <td  style="background-color: #fdc3c3;" colspan="2">사업주 부담 고용/산재 보험료</td>
           <td colspan="2">
             <% if (post.setAchievement === '실패') { %>
               <span style="color: red;"><%= post.ownerInsuranceFee %></span>
@@ -122,10 +146,18 @@
             <% } %>
           </td>
         </tr>
+        
+        <tr>
+          <td colspan="4" style="
+            height: 5px;
+            border: none !important;
+            background-color: #646464;
+          "></td>
+        </tr>
 
         <!-- KAD 지원 프로그램 -->
-        <tr class="table-secondary">
-          <th colspan="4" class="bg-light text-center">KAD 소속 라이더 지원 프로그램<br><small>(세트 성공시 지급)</small></th>
+        <tr class="table-secondary" style="border: 1px solid #646464;" >
+          <th colspan="4" class="text-center"   style="background-color: #fcffa0;">KAD 소속 라이더 지원 프로그램<br><small>(세트 성공시 지급)</small></th>
         </tr>
         <tr>
           <td class="bg-warning-subtle">프모 단가</td><td><%= post.promoRate %></td>
@@ -137,33 +169,49 @@
         <tr>
           <td colspan="2" class="bg-warning-subtle">라이더 유류비 지원</td><td colspan="2"><%= post.fuelSupport %></td>
         </tr>
-
+        
+        <tr>
+          <td colspan="4" style="
+            height: 5px;
+            border: none !important;
+            background-color: #646464;
+          "></td>
+        </tr>
+        
         <!-- 최종 지급 내역 -->
-        <tr class="table-secondary">
+        <tr class="table-secondary" style="border: 1px solid #646464;" >
           <th colspan="4" class="bg-light text-center">최종 지급 내역</th>
         </tr>
         <tr>
-          <td class="bg-success-subtle" colspan="2">[A] 지급액</td><td colspan="2"><%= post.paymentA %></td>
+          <td style="background-color: #aeb3fc;" colspan="2">[A] 지급액</td><td colspan="2" style="background-color: #dee0fa;" ><%= post.paymentA %></td>
         </tr>
         <tr>
-          <td class="bg-success-subtle" colspan="2">[B] 사업자부담 환급 총액</td><td colspan="2"><%= post.refundB %></td>
+          <td style="background-color: #aeb3fc;" colspan="2">[B] 사업자부담 환급 총액</td><td colspan="2" style="background-color: #dee0fa;" ><%= post.refundB %></td>
         </tr>
         <tr>
-          <td class="bg-success-subtle" colspan="2">[C] 소속 라이더 지원 프로그램</td><td colspan="2"><%= post.supportC %></td>
+          <td style="background-color: #aeb3fc;" colspan="2">[C] 소속 라이더 지원 프로그램</td><td colspan="2" style="background-color: #dee0fa;" ><%= post.supportC %></td>
         </tr>
         <tr>
-          <td class="bg-success" colspan="2">최종 지급액 ([A]+[B]+[C])</td><td colspan="2"><%= post.finalPayment %></td>
+          <td style="background-color: #aeb3fc;" colspan="2">최종 지급액 ([A]+[B]+[C])</td><td colspan="2" style="background-color: #dee0fa;" ><%= post.finalPayment %></td>
         </tr>
-
+        
+        <tr>
+          <td colspan="4" style="
+            height: 5px;
+            border: none !important;
+            background-color: #646464;
+          "></td>
+        </tr>
+        
         <!-- 정산 기간 -->
-        <tr class="table-secondary">
+        <tr class="table-secondary" style="border: 1px solid #646464;" >
           <th colspan="4" class="bg-light text-center">정산 기간</th>
         </tr>
         <tr>
-          <td class="bg-body-tertiary" colspan="2">정산 시작일</td><td colspan="2"><%= post.settlementStart %></td>
+          <td style="background-color: #e2e2e2;" colspan="2">정산 시작일</td><td colspan="2"><%= post.settlementStart %></td>
         </tr>
         <tr>
-          <td class="bg-body-tertiary" colspan="2">정산 종료일</td><td colspan="2"><%= post.settlementEnd %></td>
+          <td style="background-color: #e2e2e2;"colspan="2">정산 종료일</td><td colspan="2"><%= post.settlementEnd %></td>
         </tr>
         
       </table>

@@ -362,7 +362,9 @@ app.post('/write', 로그인필요, isAdmin, async (req, res) => {
       settlementStart, settlementEnd, payDay ,statementPaper
     } = req.body;
 
-    const now = new Date(now.getTime() + 9 * 60 * 60 * 1000); // UTC+9
+    const now = new Date(); // 먼저 선언
+    const nowKST = new Date(now.getTime() + 9 * 60 * 60 * 1000); // UTC+9
+
     const D = d => d.toString().padStart(2, '0');
     const hour = now.getHours(), ampm = hour < 12 ? '오전' : '오후', hour12 = hour % 12 || 12;
     const minutes = D(now.getMinutes());
@@ -448,7 +450,7 @@ app.get('/post/:id', 로그인필요, async (req, res) => {
       return res.status(404).send('게시글을 찾을 수 없습니다.');
     }
 
-    res.render('post-detail', { title: post.title, post });
+    res.render('post-detail', { title: `${post.riderName} (${post.branch}) 정산 내역서`, post });
   } catch (err) {
     console.error(err);
     res.status(500).send('게시글 조회 중 오류 발생');

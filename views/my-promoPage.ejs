@@ -5,6 +5,7 @@
 
   <% if (latestPromo) { %>
     <h4 class="text-center">📢 최근 프로모션 결과 (공지일: <%= latestPromo.date %>)</h4>
+    <h4 class="text-center" style="color: brown;">⚠️세트 미달성시 적용되지 않음⚠️</h4>
     <div class="table-responsive">
       <table class="table table-bordered table-sm text-center align-middle">
         <thead class="table-light">
@@ -31,6 +32,27 @@
           <li><strong>등수:</strong> <%= matched.rank %></li>
           <li><strong>지급액:</strong> <%= matched.pay %></li>
         </ul>
+
+        <button id="openMyPromoModal" class="d-none" data-bs-toggle="modal" data-bs-target="#myPromoModal">모달열기</button>
+
+        <div class="modal fade" id="myPromoModal" tabindex="-1" aria-labelledby="myPromoModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-info-subtle">
+                <h5 class="modal-title" id="myPromoModalLabel">🎉 나의 프로모션 지급 결과</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+              </div>
+              <div class="modal-body">
+                <p><strong>등수:</strong> <%= matched.rank %></p>
+                <p><strong>지급액:</strong> <%= matched.pay %></p>
+                <p class="text-danger small">※ 세트 미달성시 적용되지 않을 수 있습니다.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     <% } else { %>
       <p class="text-muted text-center">⚠️ 현재 프로모션 결과에 해당하지 않습니다. ㅠ.ㅠ</p>
@@ -51,8 +73,6 @@
       <% }) %>
     </ul>
 
-    
-    <!-- 📦 모달창 -->
     <div class="modal fade" id="promoModal" tabindex="-1" aria-labelledby="promoModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -83,77 +103,76 @@
   <% } %>
 </div>
 
-    <script>
-      const promoHistoryData = <%- JSON.stringify(allPromos || []) %>;
-      let selectedPromoId = null;
+<script>
+  const promoHistoryData = <%- JSON.stringify(allPromos || []) %>;
+  let selectedPromoId = null;
 
-      document.querySelectorAll('.promo-history-item').forEach(el => {
-        el.addEventListener('click', function (e) {
-          e.preventDefault();
-          const index = this.getAttribute('data-index');
-          const promo = promoHistoryData[index];
-          if (!promo || !promo.data) return;
+  document.querySelectorAll('.promo-history-item').forEach(el => {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      const index = this.getAttribute('data-index');
+      const promo = promoHistoryData[index];
+      if (!promo || !promo.data) return;
 
-          selectedPromoId = promo._id;
+      selectedPromoId = promo._id;
 
-          const modalInfo = document.getElementById('modalPromoInfo');
-          const modalTable = document.getElementById('modalPromoTableBody');
+      const modalInfo = document.getElementById('modalPromoInfo');
+      const modalTable = document.getElementById('modalPromoTableBody');
 
-          modalInfo.innerHTML = `
-            <strong>📅 작성일:</strong> ${promo.date}<br>
-            <strong>👤 작성자:</strong> ${promo.createdBy}<br>
-            <strong>🕒 등록일:</strong> ${new Date(promo.createdAt).nowKST}
-          `;
+      modalInfo.innerHTML = `
+        <strong>📅 작성일:</strong> ${promo.date}<br>
+        <strong>👤 작성자:</strong> ${promo.createdBy}<br>
+        <strong>🕒 등록일:</strong> ${new Date(promo.createdAt).toLocaleString('ko-KR')}
+      `;
 
-          modalTable.innerHTML = '';
-          promo.data.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${item.name}</td>
-              <td>${item.value}</td>
-              <td>${item.rank}</td>
-              <td>${item.pay}</td>
-            `;
-            modalTable.appendChild(row);
-          });
-
-          const modal = new bootstrap.Modal(document.getElementById('promoModal'));
-          modal.show();
-        });
+      modalTable.innerHTML = '';
+      promo.data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.value}</td>
+          <td>${item.rank}</td>
+          <td>${item.pay}</td>
+        `;
+        modalTable.appendChild(row);
       });
 
-      document.getElementById('deletePromoBtn')?.addEventListener('click', () => {
-        if (!selectedPromoId) return;
-        if (!confirm('정말 이 프로모션 결과를 삭제하시겠습니까?')) return;
+      const modal = new bootstrap.Modal(document.getElementById('promoModal'));
+      modal.show();
+    });
+  });
 
-        fetch(`/promo-result/${selectedPromoId}`, { method: 'DELETE' })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message || '삭제 완료');
-            location.reload();
-          })
-          .catch(err => {
-            console.error('❌ 삭제 오류:', err);
-            alert('삭제 중 오류가 발생했습니다.');
-          });
+  document.getElementById('deletePromoBtn')?.addEventListener('click', () => {
+    if (!selectedPromoId) return;
+    if (!confirm('정말 이 프로모션 결과를 삭제하시겠습니까?')) return;
+
+    fetch(`/promo-result/${selectedPromoId}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || '삭제 완료');
+        location.reload();
+      })
+      .catch(err => {
+        console.error('❌ 삭제 오류:', err);
+        alert('삭제 중 오류가 발생했습니다.');
       });
+  });
 
+  window.addEventListener('DOMContentLoaded', () => {
+    const myPromoBtn = document.getElementById('openMyPromoModal');
+    if (myPromoBtn) {
+      myPromoBtn.click();
+    }
+  });
 
-      // KST 시간 구하기 (UTC + 9)
-      const now = new Date();
-      const nowKST = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-      const yyyy = nowKST.getFullYear();
-      const mm = String(nowKST.getMonth() + 1).padStart(2, '0');
-      const dd = String(nowKST.getDate()).padStart(2, '0');
-      const hh = String(nowKST.getHours()).padStart(2, '0');
-      const min = String(nowKST.getMinutes()).padStart(2, '0');
-      const ss = String(nowKST.getSeconds()).padStart(2, '0');
-
-      const formatted = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
-
-      // 원하는 위치에 출력
-      document.getElementById('nowKSTTime').innerText = formatted;
-
-
-    </script>
+  const now = new Date();
+  const nowKST = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const yyyy = nowKST.getFullYear();
+  const mm = String(nowKST.getMonth() + 1).padStart(2, '0');
+  const dd = String(nowKST.getDate()).padStart(2, '0');
+  const hh = String(nowKST.getHours()).padStart(2, '0');
+  const min = String(nowKST.getMinutes()).padStart(2, '0');
+  const ss = String(nowKST.getSeconds()).padStart(2, '0');
+  const formatted = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+  document.getElementById('nowKSTTime').innerText = formatted;
+</script>
