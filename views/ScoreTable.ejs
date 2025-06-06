@@ -21,16 +21,16 @@
       </div>
 
       <!-- 주간 점수 + 저장 -->
-      <div class="col-12 col-md-4 d-flex flex-column flex-md-row align-items-center justify-content-md-end gap-3">
+        <div class="col-12 col-md-3 d-flex flex-column align-items-center align-items-md-end mt-2 gap-2">
         <div class="text-center">
-          <label class="form-label mb-1">주간 합산 점수</label><br>
-          <input type="text" id="weeklyTotalScore" class="form-control text-center"
-                 readonly style="width: 100px; background-color: #e5fa85; font-size: 1.4rem;">
+            <label class="form-label mb-1">주간 합산 점수</label><br>
+            <input type="text" id="weeklyTotalScore" class="form-control text-center"
+                readonly style="width: 100px; background-color: #e5fa85; font-size: 1.4rem;">
         </div>
         <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
-          <button id="calculateButton" class="btn btn-primary mt-4">저장 하기</button>
+            <button id="calculateButton" class="btn btn-primary">저장 하기</button>
         <% } %>
-      </div>
+        </div>
     </div>
 
     <!-- 추가 점수 및 시간 -->

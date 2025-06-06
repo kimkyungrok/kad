@@ -11,7 +11,7 @@
     body {
       margin: 0;
       font-family: "배달의민족 주아 OTF";
-      font-size: 16px; 
+      font-size: 16px;
     }
 
     input[name="username"],
@@ -22,9 +22,9 @@
     }
 
     .split-layout {
-        display: flex;
-        flex-direction: row;
-      }
+      display: flex;
+      flex-direction: row;
+    }
 
     .top-bar {
       position: fixed;
@@ -47,19 +47,26 @@
       width: 100%;
     }
 
-  @media (max-width: 768px) {
-    .top-bar {
-      flex-direction: column;
-      height: auto;
-      padding: 10px;
-      gap: 10px;
-    }
+    @media (max-width: 876px) {
+      .top-bar {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+      }
 
-    .main-content {
-      margin-top: 150px;
+      .top-bar .container {
+        transform: scale(0.6);
+        transform-origin: top left;
+        width: 167%; /* compensate for scaling */
+      }
+
+      .main-content {
+        margin-top: 160px; /* 더 여유 공간 확보 */
+      }
     }
-  }
   </style>
+
 </head>
 <body>
 
