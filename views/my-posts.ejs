@@ -7,7 +7,7 @@
     <div class="card-body">
       <h5 class="card-title">회원 정보</h5>
       <div class="table-responsive">
-        <table class="table table-bordered table-sm text-nowrap">
+        <table class="table table-bordered table-sm text-nowrap" style="font-size: 12px;">
           <tbody>
             <tr>
               <th>이름</th>
@@ -27,7 +27,7 @@
             </tr>
           </tbody>
         </table>
-        <table class="table table-bordered table-sm text-nowrap mt-2">
+        <table class="table table-bordered table-sm text-nowrap mt-2" style="font-size: 12px;">
           <tbody>
             <tr>
               <th>은행명</th>
@@ -51,7 +51,7 @@
       <form method="GET" action="/my-posts">
         <div class="row g-2">
           <div class="col-md-4">
-            <select name="branch" class="form-select">
+            <select name="branch" class="form-select"  style="font-size: 12px;">
               <option value="">전체 지사</option>
               <option value="경산">경산</option>
               <option value="시지">시지</option>
@@ -59,7 +59,7 @@
             </select>
           </div>
           <div class="col-md-4">
-            <select name="username" class="form-select">
+            <select name="username" class="form-select" style="font-size: 12px;">
               <option value="">전체 라이더</option>
               <% allUsers.forEach(u => { %>
                 <option value="<%= u.username %>"><%= u.name %></option>
@@ -67,7 +67,7 @@
             </select>
           </div>
           <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">검색</button>
+            <button type="submit" class="btn btn-primary w-100" style="font-size: 12px;">검색</button>
           </div>
         </div>
       </form>
@@ -81,7 +81,7 @@
   <form id="deleteForm" method="POST" action="/delete-posts">
     <div class="table-responsive">
       <table class="table table-hover table-bordered align-middle text-center text-nowrap">
-        <thead class="table-light">
+        <thead class="table-light" style="font-size: 12px;">
           <tr>
             <% if (['krogy', 'admin'].includes(user.username)) { %>
               <th rowspan="2"><input type="checkbox" id="checkAll"></th>
@@ -96,9 +96,9 @@
         </thead>
         <tbody>
           <% posts.forEach(post => { %>
-            <tr>
+            <tr style="font-size: 12px;">
               <% if (['krogy', 'admin'].includes(user.username)) { %>
-                <td><input type="checkbox" name="deleteIds" value="<%= post._id %>"></td>
+                <td><input type="checkbox" name="deleteIds" value="<%= post._id %>" ></td>
               <% } %>
               <td><%= post.title %></td>
               <td><%= post.riderName %></td>
@@ -112,7 +112,7 @@
                 <% } %>
               </td>
               <td>
-                <a href="/post/<%= post._id %>" class="btn btn-sm btn-outline-primary">보기</a>
+                <a href="/post/<%= post._id %>" class="btn btn-sm btn-outline-primary" style="font-size: 12px;">보기</a>
               </td>
             </tr>
           <% }) %>
@@ -120,18 +120,17 @@
       </table>
     </div>
 
-    <% if (['krogy', 'admin'].includes(user.username)) { %>
-      <div class="mt-4 d-flex justify-content-center">
-        <button type="submit" class="btn btn-danger" onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
-      </div>
-    <% } %>
+
   </form>
 
   <!-- 하단 버튼 -->
-  <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-center">
-    <a href="/" class="btn btn-secondary">홈으로</a>
     <% if (['krogy', 'admin'].includes(user.username)) { %>
-      <a href="/write" class="btn btn-primary">정산서 등록</a>
+      <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-center">
+        <button type="submit" class="btn btn-danger" style="font-size: 12px;" onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
+    <% } %>
+    <a href="/" class="btn btn-secondary" style="font-size: 12px;">홈으로</a>
+    <% if (['krogy', 'admin'].includes(user.username)) { %>
+      <a href="/write" class="btn btn-primary" style="font-size: 12px;">정산서 등록</a>
     <% } %>
   </div>
 </div>

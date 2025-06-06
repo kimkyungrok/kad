@@ -623,7 +623,7 @@ app.post('/delete-user/:id', async (req, res) => {
 
     if (result.deletedCount === 1) {
       console.log(`🗑️ 사용자 삭제 완료: ${userId}`);
-      res.redirect('/user-list'); // 유저 목록 페이지로 리디렉션
+      res.redirect('/users'); // 유저 목록 페이지로 리디렉션
     } else {
       res.status(404).send('사용자를 찾을 수 없습니다.');
     }
