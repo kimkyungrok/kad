@@ -64,9 +64,10 @@
         }
 
         body {
-          transform: scale(0.65);
+          transform: scale(0.6);
           transform-origin: top left;
-          width: 167%; /* scale 보정 */
+          width: calc(100vw / 0.6);  /* 60% 축소 보정 */
+          overflow-x: hidden;
         }
       }
   </style>
