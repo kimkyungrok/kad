@@ -1,58 +1,58 @@
 <% layout('layout') %>
-<div class="top-bar px-3 py-3" style="background-color: #f8f9fa; border-bottom: 5px solid #ddd;">
+<div class="top-bar px-3 py-4" style="background-color: #f8f9fa; border-bottom: 5px solid #ddd;">
   <div class="container">
-    <!-- 1행 -->
+
+    <!-- 지표 행 -->
     <div class="row g-3 align-items-center">
-      <!-- 좌측 지표 -->
-      <div class="col-12 col-md-9 d-flex flex-wrap gap-3 align-items-center">
+      <!-- 주간 수행 관련 -->
+      <div class="col-12 col-md-8 d-flex flex-wrap gap-3 align-items-center justify-content-start">
         <div class="d-flex align-items-center">
-          <label class="form-label mb-0 me-2">주간 수행량</label>
-          <input type="text" id="weeklyTotalCount" class="form-control text-end" readonly style="width: 80px;">
+          <label class="form-label mt-5 me-2">주간 수행량</label>
+          <input type="text" id="weeklyTotalCount" class="form-control text-end mt-5" readonly style="width: 80px;">
         </div>
         <div class="d-flex align-items-center">
-          <label class="form-label mb-0 me-2">거절 및 배차취소</label>
-          <input type="text" id="weeklyCancelScore" class="form-control text-end" readonly style="width: 80px;">
+          <label class="form-label mt-5 me-2">거절 및 배차취소</label>
+          <input type="text" id="weeklyCancelScore" class="form-control text-end mt-5" readonly style="width: 80px;">
         </div>
         <div class="d-flex align-items-center">
-          <label class="form-label mb-0 me-2">수행율</label>
-          <input type="text" id="weeklyAchievement" class="form-control text-end" readonly style="width: 80px;">
+          <label class="form-label mt-5 me-2">수행율</label>
+          <input type="text" id="weeklyAchievement" class="form-control text-end mt-5" readonly style="width: 80px;">
         </div>
       </div>
 
-      <!-- 우측 점수 + 버튼 -->
-      <div class="col-12 col-md-3 d-flex flex-column align-items-md-end align-items-start gap-2">
+      <!-- 주간 점수 + 저장 -->
+      <div class="col-12 col-md-4 d-flex flex-column flex-md-row align-items-center justify-content-md-end gap-3">
         <div class="text-center">
           <label class="form-label mb-1">주간 합산 점수</label><br>
           <input type="text" id="weeklyTotalScore" class="form-control text-center"
                  readonly style="width: 100px; background-color: #e5fa85; font-size: 1.4rem;">
         </div>
         <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
-          <button id="calculateButton" class="btn btn-primary">저장 하기</button>
+          <button id="calculateButton" class="btn btn-primary mt-4">저장 하기</button>
         <% } %>
       </div>
     </div>
 
-    <!-- 2행 -->
-    <div class="row g-3 align-items-center mt-2">
-      <!-- 좌측 점수 -->
-      <div class="col-12 col-md-9 d-flex flex-wrap gap-3 align-items-center">
+    <!-- 추가 점수 및 시간 -->
+    <div class="row mt-3">
+      <div class="col-12 col-md-8 d-flex flex-wrap gap-3 align-items-center">
         <div class="d-flex align-items-center">
-          <label class="form-label mb-0 me-2">수행율 점수</label>
-          <input type="text" id="weeklyAchievementScore" class="form-control text-end" readonly style="width: 80px;">
+          <label class="form-label mb-5 me-2">수행율 점수</label>
+          <input type="text" id="weeklyAchievementScore" class="form-control text-end mb-5 " readonly style="width: 80px;">
         </div>
         <div class="d-flex align-items-center">
-          <label class="form-label mb-0 me-2">시간대 총 점수</label>
-          <input type="text" id="weeklyTimeSlotScore" class="form-control text-end" readonly style="width: 80px;">
+          <label class="form-label mb-5 me-2">시간대 총 점수</label>
+          <input type="text" id="weeklyTimeSlotScore" class="form-control text-end mb-5 " readonly style="width: 80px;">
         </div>
       </div>
 
-      <!-- 우측 시간 -->
-      <div class="col-12 col-md-3 text-md-end text-muted" id="finalRegScoreTime" style="font-size: 0.9rem;">
-        <!-- 저장 시간 JS로 표시됨 -->
+      <div class="col-12 col-md-4 text-md-end text-center text-muted" id="finalRegScoreTime" style="font-size: 0.9rem;">
+        <!-- (마지막 저장 시간: yyyy-mm-dd hh:mm:ss) -->
       </div>
     </div>
   </div>
 </div>
+
 
 
 
