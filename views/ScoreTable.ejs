@@ -3,8 +3,8 @@
   <div class="container">
     
     <!-- 1행: 제목 + 최종 시간 -->
-    <div class="row">
-      <div class="col-6 d-flex align-items-center">
+    <div class="row mt-2 gy-2 gx-3">
+      <div class="col-6 col-md-auto">
         <h5 class="mb-0">수행 현황</h5>
       </div>
       <div class="col-6 text-end text-muted" id="finalRegScoreTime" style="font-size: 0.9rem;">
@@ -15,40 +15,40 @@
     <!-- 2행: 지표 + 점수 + 버튼 -->
     <div class="row mt-2 gy-2 gx-3 align-items-center">
       <!-- 주간 수행 지표 -->
-      <div class="col-6 col-md-auto d-flex align-items-center">
+      <div class="col-6 col-md-auto">
         <label class="form-label mb-0 me-2" style="font-size: 15px;">주간 수행량</label>
-        <input type="text" id="weeklyTotalCount" class="form-control form-control-sm text-end" readonly style="width: 80px; font-size: 15px;">
+        <input type="text" id="weeklyTotalCount" class="form-control form-control-sm text-end" readonly style=" font-size: 15px;">
       </div>
-      <div class="col-6 col-md-auto d-flex align-items-center">
+      <div class="col-6 col-md-auto">
         <label class="form-label mb-0 me-2" style="font-size: 15px;">거절 및 배차취소</label>
-        <input type="text" id="weeklyCancelScore" class="form-control form-control-sm text-end" readonly style="width: 80px; font-size: 15px;">
+        <input type="text" id="weeklyCancelScore" class="form-control form-control-sm text-end" readonly style=" font-size: 15px;">
       </div>
-      <div class="col-6 col-md-auto d-flex align-items-center">
+      <div class="col-6 col-md-auto">
         <label class="form-label mb-0 me-2" style="font-size: 15px;">주간 수행율</label>
-        <input type="text" id="weeklyAchievement" class="form-control form-control-sm text-end" readonly style="width: 80px; font-size: 15px;">
+        <input type="text" id="weeklyAchievement" class="form-control form-control-sm text-end" readonly style=" font-size: 15px;">
       </div>
 
       <!-- 수행율 점수 -->
-      <div class="col-6 col-md-auto d-flex align-items-center">
+      <div class="col-6 col-md-auto">
         <label class="form-label mb-0 me-2" style="font-size: 15px;">주간 수행율 점수</label>
-        <input type="text" id="weeklyAchievementScore" class="form-control form-control-sm text-end" readonly style="width: 80px; font-size: 15px;">
+        <input type="text" id="weeklyAchievementScore" class="form-control form-control-sm text-end" readonly style=" font-size: 15px;">
       </div>
 
       <!-- 시간대 점수 -->
-      <div class="col-6 col-md-auto d-flex align-items-center">
+      <div class="col-6 col-md-auto">
         <label class="form-label mb-0 me-2" style="font-size: 15px;">시간대 총 점수</label>
-        <input type="text" id="weeklyTimeSlotScore" class="form-control form-control-sm text-end" readonly style="width: 80px; font-size: 15px;">
+        <input type="text" id="weeklyTimeSlotScore" class="form-control form-control-sm text-end" readonly style=" font-size: 15px;">
       </div>
 
       <!-- 합산 점수 -->
-      <div class="col-6 col-md-auto d-flex align-items-center">
+      <div class="col-6 col-md-auto">
         <label class="form-label mb-0 me-2" style="font-size: 15px;">주간 합산 점수</label>
         <input type="text" id="weeklyTotalScore" class="form-control text-center" readonly style="width: 100px; background-color: #e5fa85; font-size: 15px;">
       </div>
 
       <!-- 저장 버튼 -->
       <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
-      <div class="col-6 col-md-auto d-flex align-items-center">
+      <div class="col-6 col-md-auto">
         <button id="calculateButton" class="btn btn-primary">저장 하기</button>
       </div>
       <% } %>
