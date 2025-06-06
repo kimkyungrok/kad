@@ -63,19 +63,12 @@
           margin-top: 160px;             /* 위 요소 줄어든 만큼 조정 */
         }
 
-        html, body {
-          margin: 0;
-          padding: 0;
-          transform: scale(0.7);  
-          overflow-x: hidden;
-        }
-
-        .mobile-scaled {
+        body {
           transform: scale(0.6);
           transform-origin: top left;
-          width: 166.67vw; /* 100 / 0.6 = 166.666... */
+          width: calc(100vw / 0.6);  /* 60% 축소 보정 */
+          overflow-x: hidden;
         }
-
       }
   </style>
 
