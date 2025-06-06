@@ -17,6 +17,7 @@ const now = new Date();
 const nowKST = new Date(now.getTime() + 9 * 60 * 60 * 1000); // KST
 const bodyParser = require('body-parser');
 const cron = require('node-cron');
+const nodemailer = require('nodemailer');
 
 app.use('/uploads', express.static('/public/uploads'));
 app.use(express.static(__dirname + '/public'));
@@ -74,8 +75,14 @@ function 로그인필요(req, res, next) {
     res.redirect('/login');
   }
 }
-
-
+// 메일 발송
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'krogy123@gmail.com', // 발신자 이메일
+    pass: 'okbf tahn sche hdbx'           // Gmail의 앱 비밀번호 (2단계 인증 사용자 필수)
+  }
+});
 
 // 아이디 중복확인 API
 app.post('/check-username', async (req, res) => {
@@ -135,7 +142,11 @@ app.get('/login-fail', (req, res) => {
 // 회원가입 처리 (비밀번호 해시화 없이 저장)
 app.post('/register', async (req, res) => {
   try {
-    const { username, password, passwordConfirm, name, connectId, phone, birthdate, branch, bankNameSelect, bankNameInput, accountNumber, depositAccount } = req.body;
+    const {
+      username, password, passwordConfirm, name, connectId, phone,
+      birthdate, branch, bankNameSelect, bankNameInput,
+      accountNumber, depositAccount
+    } = req.body;
 
     if (!username || !password || !passwordConfirm || !name || !connectId || !phone || !birthdate || !branch || !accountNumber || !depositAccount) {
       return res.json({ status: 'error', message: '모든 필수 입력 항목을 채워주세요.' });
@@ -161,6 +172,8 @@ app.post('/register', async (req, res) => {
     }
 
     const nowKST = new Date(Date.now() + 9 * 60 * 60 * 1000);
+
+    // 1️⃣ 회원정보 저장
     await db.collection('users').insertOne({
       username,
       password,
@@ -177,12 +190,40 @@ app.post('/register', async (req, res) => {
     });
 
     console.log(`회원가입 완료 (승인 대기): ${username}`);
+
+    // 2️⃣ 관리자에게 메일 전송
+    const mailOptions = {
+      from: '"KAD 회원가입 시스템" <krogy123@gmail.com>',
+      to: 'krogy123@gmail.com,krogy@naver.com',
+      subject: `[가입요청] ${name} 님이 회원가입을 요청했습니다.`,
+      text: `
+📌 이름: ${name}
+👤 아이디: ${username}
+🏢 지사: ${branch}
+📱 전화번호: ${phone}
+
+신규 회원가입 요청이 접수되었습니다.
+관리자 페이지에서 승인 처리를 해 주세요.
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('❌ 메일 발송 실패:', error);
+      } else {
+        console.log('✅ 가입요청 메일 발송 완료:', info.response);
+      }
+    });
+
+    // 3️⃣ 사용자에게 응답
     res.json({ status: 'success', message: '회원가입 신청이 완료되었습니다. 관리자의 승인을 기다려주세요.' });
+
   } catch (err) {
-    console.error(err);
+    console.error('❌ 회원가입 처리 중 오류:', err);
     res.status(500).send('서버 오류 발생');
   }
 });
+
 
 // 로그인 페이지
 app.get('/login', (req, res) => {
@@ -1098,3 +1139,40 @@ cron.schedule('0 21 * * 2', async () => {
     console.error('❌ 주간 점수 삭제 실패:', err);
   }
 });
+
+// 아이디 및 비밀번호 찾기 페이지 렌더링
+app.get('/FindAccount', (req, res) => {
+  res.render('FindAccount', { message: '' });
+});
+
+// 아이디 찾기 처리
+app.post('/find-id', async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const user = await db.collection('users').findOne({ name, phone });
+    const message = user
+      ? `당신의 아이디는 ${user.username}입니다.`
+      : '일치하는 정보가 없습니다.';
+    res.render('FindAccount', { message });
+  } catch (err) {
+    console.error('아이디 찾기 오류:', err);
+    res.status(500).send('서버 오류');
+  }
+});
+
+// 비밀번호 찾기 처리
+app.post('/find-password', async (req, res) => {
+  try {
+    const { username, phone } = req.body;
+    const user = await db.collection('users').findOne({ username, phone });
+    const message = user
+      ? `비밀번호는 ${user.password} 입니다.`
+      : '일치하는 정보가 없습니다.';
+    res.render('FindAccount', { message });
+  } catch (err) {
+    console.error('비밀번호 찾기 오류:', err);
+    res.status(500).send('서버 오류');
+  }
+});
+
+// 메일 발송자 설정 (예: Gmail 기준)
