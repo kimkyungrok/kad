@@ -56,11 +56,9 @@
   </div>
 </div>
 
-
-
 <div class="main-content">
   <div class="container-fluid">
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row g-4">
       <% const days = ['Wednesday','Thursday','Friday','Saturday','Sunday','Monday','Tuesday'];
          const labels = {
            'Wednesday':'수요일','Thursday':'목요일','Friday':'금요일','Saturday':'토요일',
@@ -77,52 +75,65 @@
          };
       %>
       <% for (let day of days) { %>
-      <div class="col">
-        <h4 class="text-center align-middle"><%= labels[day] %></h4>
-        <div class="table-responsive">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th class="text-center align-middle" style="width: 20%; background-color: #ced0f4;">운행 요일</th>
-                <th class="text-center align-middle" style="width: 30%; background-color: #ced0f4;">운행 시간대</th>
-                <th class="text-center align-middle" style="width: 15%; background-color: #ced0f4;">목표<br>수행량</th>
-                <th class="text-center align-middle" style="width: 15%; background-color: #ced0f4;">실제<br>수행량</th>
-                <th class="text-center align-middle" style="width: 15%; background-color: #ced0f4;">달성<br>점수</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% const times = ['오전/점심 피크','오후 논 피크','저녁 피크','심야 논 피크']; %>
-              <% for (let i = 0; i < 4; i++) { %>
-                <tr>
-                  <% if (i === 0) { %>
-                    <td class="text-center align-middle" rowspan="7"><%= labels[day] %></td>
-                  <% } %>
-                  <td class="text-center align-middle"><%= times[i] %></td>
-                  <td class="text-center align-middle" style="background-color: #ffb9b9;"><input class="form-control" style="background-color: #ffb9b9;" name="<%= day %>tg<%= i+1 %>" value="<%= goals[day][i] %>" readonly></td>
-                  <td class="text-center align-middle" style="background-color: #fffaa3;"><input class="form-control" name="<%= day %>Cnt<%= i+1 %>"></td>
-                  <td class="text-center align-middle" style="background-color: #cec5ff;"><input class="form-control" style="background-color: #cec5ff;" name="<%= day %>Value<%= i+1 %>" readonly></td>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-header text-center fw-bold" style="background-color: #f1f3ff;">
+            <%= labels[day] %>
+          </div>
+          <div class="card-body p-2 table-responsive">
+            <table class="table table-bordered align-middle mb-0">
+              <thead>
+                <tr class="text-center">
+                  <th style="width: 25%; background-color: #ced0f4;">운행 시간대</th>
+                  <th style="width: 15%; background-color: #ced0f4;">목표</th>
+                  <th style="width: 15%; background-color: #ced0f4;">실제</th>
+                  <th style="width: 15%; background-color: #ced0f4;">점수</th>
                 </tr>
-              <% } %>
-              <tr>
-                <td colspan="2" class="text-center align-middle">거절</td>
-                <td colspan="2" style="background-color: #ffb8b8;"><input class="form-control" name="<%= day %>Denied"></td>
-              </tr>
-              <tr>
-                <td colspan="2" class="text-center align-middle">배차 취소</td>
-                <td colspan="2" style="background-color: hsl(206, 100%, 87%);"><input class="form-control" name="<%= day %>Cancel"></td>
-              </tr>
-              <tr>
-                <td colspan="2" class="text-center align-middle">일 점수</td>
-                <td colspan="2"><input class="form-control" style="background-color: #ffadf8;"name="<%= day %>Total"></td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <% const times = ['오전/점심 피크','오후 논 피크','저녁 피크','심야 논 피크']; %>
+                <% for (let i = 0; i < 4; i++) { %>
+                  <tr>
+                    <td class="text-center"><%= times[i] %></td>
+                    <td style="background-color: #ffb9b9;">
+                      <input class="form-control text-center" style="background-color: #ffb9b9;" name="<%= day %>tg<%= i+1 %>" value="<%= goals[day][i] %>" readonly>
+                    </td>
+                    <td style="background-color: #fffaa3;">
+                      <input class="form-control text-center" name="<%= day %>Cnt<%= i+1 %>">
+                    </td>
+                    <td style="background-color: #cec5ff;">
+                      <input class="form-control text-center" style="background-color: #cec5ff;" name="<%= day %>Value<%= i+1 %>" readonly>
+                    </td>
+                  </tr>
+                <% } %>
+                <tr>
+                  <td colspan="2" class="text-center">거절</td>
+                  <td colspan="2" style="background-color: #ffb8b8;">
+                    <input class="form-control" name="<%= day %>Denied">
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" class="text-center">배차 취소</td>
+                  <td colspan="2" style="background-color: #d6f1ff;">
+                    <input class="form-control" name="<%= day %>Cancel">
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" class="text-center fw-bold">일 점수</td>
+                  <td colspan="2">
+                    <input class="form-control text-center" style="background-color: #ffadf8;" name="<%= day %>Total">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <% } %>
     </div>
   </div>
 </div>
+
 
 <script>
   const currentUsername = "<%= currentUser?.username || '' %>";
