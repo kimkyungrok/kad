@@ -7,71 +7,58 @@
 
   <title><%= typeof title !== 'undefined' ? title : 'MySite' %></title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: "배달의민족 주아 OTF";
-      font-size: 16px;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: "배달의민족 주아 OTF", Arial, sans-serif;
+    font-size: 16px;
+  }
 
-    input[name="username"],
-    input[name="password"],
-    input[name="passwordConfirm"] {
-      font-family: Arial !important;
-      font-weight: bold;
-    }
+  input[name="username"],
+  input[name="password"],
+  input[name="passwordConfirm"] {
+    font-family: Arial !important;
+    font-weight: bold;
+  }
 
-    .split-layout {
-      display: flex;
-      flex-direction: row;
-    }
+  .split-layout {
+    display: flex;
+    flex-direction: row;
+  }
 
+  .top-bar {
+    position: fixed;
+    top: 65px; /* header 아래에 위치 */
+    left: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+
+  .main-content {
+    margin-top: 130px; /* top-bar + header 높이 보정 */
+    padding: 20px;
+    width: 100%;
+  }
+
+  @media (max-width: 876px) {
     .top-bar {
-      position: fixed;
-      top: 65px; /* header 아래에 위치 */
-      left: 0;
-      width: 100%;
-      height: auto;
-      background-color: #f8f9fa;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 0 30px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px 15px;
     }
 
     .main-content {
-      margin-top: 100px; /* header + top-bar 높이 */
-      padding: 20px;
-      width: 100%;
+      margin-top: 150px; /* 모바일에서 top-bar가 늘어나는 것에 대비 */
     }
-
-     @media (max-width: 876px) {
-        .top-bar {
-          flex-direction: column;
-          height: auto;
-          padding: 10px;
-          gap: 10px;
-
-
-           /*transform: scale(0.5);         /* 전체 축소 */
-           /*transform-origin: top left;
-           /*width: 200%;                   /* scale 보정용 */
-        }
-
-        .main-content {
-          margin-top: 160px;             /* 위 요소 줄어든 만큼 조정 */
-        }
-
-        body {
-          transform: scale(0.8);
-          transform-origin: top left;
-          width: calc(100vw / 0.8);  /* 60% 축소 보정 */
-          overflow-x: hidden;
-        }
-      }
-  </style>
+  }
+</style>
 
 </head>
 <body>
