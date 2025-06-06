@@ -4,12 +4,12 @@
   <h2 class="mb-4 text-center">프로모션 결과</h2>
 
   <% if (latestPromo) { %>
-    <h4 class="text-center">📢 최근 프로모션 결과 (공지일: <%= latestPromo.date %>)</h4>
-    <h4 class="text-center" style="color: brown;">⚠️세트 미달성시 적용되지 않음⚠️</h4>
+    <h4 class="text-center">📲 최근 프로모션 결과 (공지일: <%= latestPromo.date %>)</h4>
+    <h4 class="text-center" style="color: brown;">⚠️세트 미다성시 적용되지 않음⚠️</h4>
     <div class="table-responsive">
       <table class="table table-bordered table-sm text-center align-middle">
         <thead class="table-light">
-          <tr><th>이름</th><th>수행 건수</th><th>등수</th><th>지급액</th></tr>
+          <tr><th>이름</th><th>수행 건수</th><th>등수</th><th>지금액</th></tr>
         </thead>
         <tbody>
           <% latestPromo.data.forEach(item => { %>
@@ -26,43 +26,35 @@
 
     <% const matched = latestPromo.data.find(x => x.name === user.name); %>
     <% if (matched) { %>
-      <div class="mt-4">
-        <h5>🎉 나의 프로모션 지급 결과</h5>
-        <ul>
-          <li><strong>등수:</strong> <%= matched.rank %></li>
-          <li><strong>지급액:</strong> <%= matched.pay %></li>
-        </ul>
+      <button id="openMyPromoModal" class="d-none" data-bs-toggle="modal" data-bs-target="#myPromoModal">모달열기</button>
 
-        <button id="openMyPromoModal" class="d-none" data-bs-toggle="modal" data-bs-target="#myPromoModal">모달열기</button>
-
-        <div class="modal fade" id="myPromoModal" tabindex="-1" aria-labelledby="myPromoModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header bg-info-subtle">
-                <h5 class="modal-title" id="myPromoModalLabel">🎉 나의 프로모션 지급 결과</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-              </div>
-              <div class="modal-body">
-                <p><strong>등수:</strong> <%= matched.rank %></p>
-                <p><strong>지급액:</strong> <%= matched.pay %></p>
-                <p class="text-danger small">※ 세트 미달성시 적용되지 않을 수 있습니다.</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-              </div>
+      <div class="modal fade" id="myPromoModal" tabindex="-1" aria-labelledby="myPromoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-info-subtle">
+              <h5 class="modal-title" id="myPromoModalLabel">🎉 나의 프로모션 지금 결과</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body text-center">
+              <p><strong>등수:</strong> <%= matched.rank %></p>
+              <p><strong>지금액:</strong> <%= matched.pay %></p>
+              <p class="text-danger small">※ 세트 미다성시 적용되지 않을 수 있습니다.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
           </div>
         </div>
       </div>
     <% } else { %>
-      <p class="text-muted text-center">⚠️ 현재 프로모션 결과에 해당하지 않습니다. ㅠ.ㅠ</p>
+      <p class="text-muted text-center">⚠️ 현재 프로모션 결과에 해당하지 않습니다. 히.히.</p>
     <% } %>
   <% } else { %>
     <p class="text-muted text-center">📭 아직 저장된 프로모션 결과가 없습니다.</p>
   <% } %>
 
   <% if (user.username === 'admin' || user.username === 'krogy') { %>
-    <h5 class="mt-5">🗂 이전 등록된 전체 결과</h5>
+    <h5 class="mt-5">📂 이전 등록된 전체 결과</h5>
     <ul id="promoHistoryList" class="list-group mb-4">
       <% allPromos.forEach((p, idx) => { %>
         <li class="list-group-item">
@@ -85,7 +77,7 @@
             <div class="table-responsive">
               <table class="table table-bordered table-sm text-center">
                 <thead class="table-light">
-                  <tr><th>이름</th><th>정산 금액</th><th>등수</th><th>지급액</th></tr>
+                  <tr><th>이름</th><th>정산 금액</th><th>등수</th><th>지금액</th></tr>
                 </thead>
                 <tbody id="modalPromoTableBody"></tbody>
               </table>

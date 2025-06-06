@@ -45,10 +45,12 @@
         <% } else { %>
 
           <% if (['krogy', 'admin'].includes(user.username)) { %>
-            <li class="nav-item"><a class="nav-link" href="/admin-pending">가입 승인</a></li>
+            
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">관리자 메뉴</a>
               <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="/admin-pending">가입 승인 대기</a></li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/users">라이더 목록</a></li>
                 <li><a class="dropdown-item" href="/promoReg">프로모션 등록</a></li>
                 <li><a class="dropdown-item" href="/accountTable">프로모션 결과 확인/공지</a></li>
@@ -69,6 +71,8 @@
               <li><a class="dropdown-item" href="/my-promoPage">나의 프로모션 확인</a></li>
             </ul>
           </li>
+          <li class="nav-item"><a class="nav-link" href="/ScoreTable">시간대별 현황</a></li>
+
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">마이 페이지</a>
             <ul class="dropdown-menu dropdown-menu-end">

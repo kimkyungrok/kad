@@ -16,6 +16,8 @@ const isAdmin = require('./middlewares/isAdmin');
 const now = new Date();
 const nowKST = new Date(now.getTime() + 9 * 60 * 60 * 1000); // KST
 const bodyParser = require('body-parser');
+const cron = require('node-cron');
+
 app.use('/uploads', express.static('/public/uploads'));
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -310,10 +312,7 @@ app.get('/write', 로그인필요, async (req, res) => {
     };
   }
 
-  res.render('write', {
-    title: '정보 등록',
-    latestPromo
-  });
+  res.render('write', { title: '정보 등록',latestPromo});
 });
 
 
@@ -1043,6 +1042,55 @@ app.post('/reject-user/:id', async (req, res) => {
   res.redirect('/admin-pending');
 });
 
-app.get('/ScoreTable', (req, res) => {
-    res.render('ScoreTable'); // 'ScoreTable.ejs' 파일 렌더링
+// GET: ScoreTable 페이지 로딩
+app.get('/ScoreTable', 로그인필요, async (req, res) => {
+  const user = req.session.user;
+
+  const adminList = await db.collection('admins').find().toArray();
+  const saved = await db.collection('score_data').findOne({ _id: 'shared' }); // 고정된 ID 사용
+
+  res.render('ScoreTable', {
+    title: '시간대별 점수',
+    allScoreData: saved?.data || {}, // 공통 점수 데이터
+    currentUser: user,
+    adminList
+  });
+});
+
+
+app.post('/save-score', 로그인필요, async (req, res) => {
+  try {
+    const user = req.session.user;
+    const { data } = req.body;
+
+    // 관리자 확인
+    const adminList = await db.collection('admins').find().toArray();
+    const isAdmin = adminList.some(admin => admin.username === user.username);
+
+    if (!isAdmin) return res.status(403).json({ error: '관리자만 저장할 수 있습니다.' });
+
+    // score_data 컬렉션에 단일 문서로 저장
+    await db.collection('score_data').updateOne(
+      { _id: 'shared' },
+      { $set: { data, updatedAt: new Date() } },
+      { upsert: true }
+    );
+
+    res.json({ status: 'success' });
+  } catch (err) {
+    console.error('❌ 점수 저장 실패:', err);
+    res.status(500).json({ error: '저장 실패' });
+  }
+});
+
+
+
+// 매주 수요일 오전 6시(KST) 삭제 (→ UTC 화요일 21시)
+cron.schedule('0 21 * * 2', async () => {
+  try {
+    await db.collection('score_data').deleteMany({});
+    console.log('✅ 주간 점수 데이터 삭제 완료');
+  } catch (err) {
+    console.error('❌ 주간 점수 삭제 실패:', err);
+  }
 });
