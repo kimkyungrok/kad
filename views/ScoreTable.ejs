@@ -1,48 +1,62 @@
 <% layout('layout') %>
-<div class="top-bar px-3 py-2" style="background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
-  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 gap-md-4 flex-wrap w-100">
-    <h4 class="mb-0 me-md-3">스코어 테이블</h4>
+<div class="top-bar px-3 py-3" style="background-color: #f8f9fa; border-bottom: 5px solid #ddd;">
+  <div class="container">
+    <!-- 1행 -->
+    <div class="row align-items-center">
+      <!-- 좌측 지표 -->
+      <div class="col-md-9 d-flex flex-wrap gap-3 align-items-center">
+        <div class="d-flex align-items-center">
+          <label class="form-label mb-0 me-2">주간 수행량</label>
+          <input type="text" id="weeklyTotalCount" class="form-control form-control text-end" readonly style="width: 80px;">
+        </div>
+        <div class="d-flex align-items-center">
+          <label class="form-label mb-0 me-2">거절 및 배차취소</label>
+          <input type="text" id="weeklyCancelScore" class="form-control form-control text-end" readonly style="width: 80px;">
+        </div>
+        <div class="d-flex align-items-center">
+          <label class="form-label mb-0 me-2">수행율</label>
+          <input type="text" id="weeklyAchievement" class="form-control form-control text-end" readonly style="width: 80px;">
+        </div>
+      </div>
 
-    <div class="d-flex align-items-center gap-2">
-      <label class="form-label mb-0 small">주간 수행량</label>
-      <input type="text" class="form-control form-control-sm text-end" id="weeklyTotalCount" readonly style="width: 60px;">
+      <!-- 우측 점수 + 버튼 -->
+      <div class="col-md-2 d-flex align-items-center justify-content-end gap-3 mt-3 mt-md-0">
+        <div class="text-center">
+          <label class="form-label mb-1">주간 합산 점수</label><br>
+          <input type="text" id="weeklyTotalScore" class="form-control text-center"
+                 readonly style="width: 80px; background-color: #e5fa85; font-size: 1.4rem;">
+        </div>
+        <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
+        <button id="calculateButton" class="btn btn-primary  mt-3 mt-md-4">저장 하기</button>
+        <% } %>
+      </div>
     </div>
 
-    <div class="d-flex align-items-center gap-2">
-      <label class="form-label mb-0 small">거절 및 배차취소</label>
-      <input type="text" class="form-control form-control-sm text-end" id="weeklyCancelScore" readonly style="width: 60px;">
+    <!-- 2행 -->
+    <div class="row align-items-center">
+      <!-- 좌측 점수 -->
+      <div class="col-md-9 d-flex flex-wrap gap-3 align-items-center">
+        <div class="d-flex align-items-center">
+          <label class="form-label mb-0 me-2">수행율 점수</label>
+          <input type="text" id="weeklyAchievementScore" class="form-control form-control text-end" readonly style="width: 80px;">
+        </div>
+        <div class="d-flex align-items-center">
+          <label class="form-label mb-0 me-2">시간대 총 점수</label>
+          <input type="text" id="weeklyTimeSlotScore" class="form-control form-control text-end" readonly style="width: 80px;">
+        </div>
+      </div>
+
+      <!-- 우측 시간 -->
+      <div class="col-md-2 text-end text-muted" id="finalRegScoreTime" style="font-size: 0.9rem;">      </div>
     </div>
 
-    <div class="d-flex align-items-center gap-2">
-      <label class="form-label mb-0 small">수행율 (%)</label>
-      <input type="text" class="form-control form-control-sm text-end" id="weeklyAchievement" readonly style="width: 60px;">
-    </div>
-
-    <div class="d-flex align-items-center gap-2">
-      <label class="form-label mb-0 small">수행율 점수</label>
-      <input type="text" class="form-control form-control-sm text-end" id="weeklyAchievementScore" readonly style="width: 60px;">
-    </div>
-
-    <div class="d-flex align-items-center gap-2">
-      <label class="form-label mb-0 small">시간대 총 점수</label>
-      <input type="text" class="form-control form-control-sm text-end" id="weeklyTimeSlotScore" readonly style="width: 60px;">
-    </div>
-
-    <div class="d-flex align-items-center gap-2">
-      <label class="form-label mb-0" style="font-size: 1.2rem;">주간 합산 점수</label>
-      <input type="text" class="form-control text-center" id="weeklyTotalScore"
-             readonly style="width: 80px; background-color: #e5fa85; font-size: 1.4rem;">
-    </div>
-
-    <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
-        <button id="calculateButton" class="btn btn-primary ms-md-4 mt-2 mt-md-0">저장 하기</button>
-    <% } %>
   </div>
 </div>
 
+
 <div class="main-content">
   <div class="container-fluid">
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
       <% const days = ['Wednesday','Thursday','Friday','Saturday','Sunday','Monday','Tuesday'];
          const labels = {
            'Wednesday':'수요일','Thursday':'목요일','Friday':'금요일','Saturday':'토요일',
@@ -65,11 +79,11 @@
           <table class="table table-bordered">
             <thead>
               <tr>
-                <th class="text-center align-middle" style="width: 30.5%; background-color: #ced0f4;">운행 요일</th>
-                <th class="text-center align-middle" style="width: 30.5%; background-color: #ced0f4;">운행 시간대</th>
-                <th class="text-center align-middle" style="width: 13%; background-color: #ced0f4;">목표<br>수행량</th>
-                <th class="text-center align-middle" style="width: 13%; background-color: #ced0f4;">실제<br>수행량</th>
-                <th class="text-center align-middle" style="width: 13%; background-color: #ced0f4;">달성<br>점수</th>
+                <th class="text-center align-middle" style="width: 20%; background-color: #ced0f4;">운행 요일</th>
+                <th class="text-center align-middle" style="width: 30%; background-color: #ced0f4;">운행 시간대</th>
+                <th class="text-center align-middle" style="width: 15%; background-color: #ced0f4;">목표<br>수행량</th>
+                <th class="text-center align-middle" style="width: 15%; background-color: #ced0f4;">실제<br>수행량</th>
+                <th class="text-center align-middle" style="width: 15%; background-color: #ced0f4;">달성<br>점수</th>
               </tr>
             </thead>
             <tbody>
@@ -111,6 +125,7 @@
   const adminUsernames = <%- JSON.stringify(adminList.map(a => a.username)) %>;
   const isAdmin = adminUsernames.includes(currentUsername);
   const savedData = <%- JSON.stringify(allScoreData) %>;  // 모든 유저의 점수 데이터
+  const savedAt = "<%= updatedAt ? new Date(updatedAt).toLocaleString('ko-KR') : '' %>";
 </script>
 
 
@@ -236,33 +251,48 @@
     }
 
     const btn = document.getElementById("calculateButton");
-    if (btn) {
-      btn.addEventListener("click", () => {
-        runAllCalculations();
-        const inputs = document.querySelectorAll('input');
-        const data = {};
-        inputs.forEach(input => {
-          const key = input.name || input.id;
-          if (key) data[key] = input.value;
+   if (btn) {
+        btn.addEventListener("click", () => {
+            runAllCalculations();
+            const inputs = document.querySelectorAll('input');
+            const data = {};
+            inputs.forEach(input => {
+            const key = input.name || input.id;
+            if (key) data[key] = input.value;
+            });
+
+            // 📌 최종 적용 시간 갱신 (클라이언트 시간 기준)
+            const now = new Date();
+            const formatDate = (d) => {
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            };
+            const finalTimeText = `(마지막 저장 시간: ${formatDate(now)})`;
+            document.getElementById("finalRegScoreTime").innerText = finalTimeText;
+
+            // 저장 요청
+            fetch('/save-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data })
+            }).then(res => {
+            if (res.ok) alert("✅ 저장 완료!");
+            else alert("❌ 저장 실패");
+            }).catch(err => {
+            console.error("❌ 저장 오류:", err);
+            alert("저장 중 오류가 발생했습니다.");
+            });
         });
-        fetch('/save-score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data })
-        }).then(res => {
-          if (res.ok) alert("✅ 저장 완료!");
-          else alert("❌ 저장 실패");
-        }).catch(err => {
-          console.error("❌ 저장 오류:", err);
-          alert("저장 중 오류가 발생했습니다.");
-        });
-      });
     }
 
     const savedData = <%- JSON.stringify(allScoreData || {}) %>;
     for (const key in savedData) {
       const el = document.querySelector(`[name="${key}"], [id="${key}"]`);
       if (el) el.value = savedData[key];
+    }
+
+      if (typeof savedAt === 'string' && savedAt) {
+        document.getElementById("finalRegScoreTime").innerText = `(마지막 저장 시간: ${savedAt})`;
     }
 
     runAllCalculations();

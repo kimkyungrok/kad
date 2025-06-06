@@ -33,7 +33,7 @@
             <th>전화번호</th>
             <th>가입 지사</th>
             <th>가입일</th>
-            <th>관리</th>
+            <th colspan="2">관리</th>
           </tr>
         </thead>
         <tbody id="userTableBody">
@@ -48,6 +48,11 @@
               <td>
                 <div class="d-flex flex-column gap-1">
                   <a href="/edit-user/<%= user._id %>" class="btn btn-sm btn-warning">수정</a>
+                  
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-column gap-1">
                   <form action="/delete-user/<%= user._id %>" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?')">
                     <button type="submit" class="btn btn-sm btn-danger">삭제</button>
                   </form>

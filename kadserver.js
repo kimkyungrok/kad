@@ -1047,13 +1047,17 @@ app.get('/ScoreTable', 로그인필요, async (req, res) => {
   const user = req.session.user;
 
   const adminList = await db.collection('admins').find().toArray();
-  const saved = await db.collection('score_data').findOne({ _id: 'shared' }); // 고정된 ID 사용
+  const scoreDoc = await db.collection('score_data').findOne({ _id: 'shared' });
+
+  const savedScore = scoreDoc?.data || {};
+  const savedAt = scoreDoc?.updatedAt || null; // <-- 이 부분에서 const 키워드 필요
 
   res.render('ScoreTable', {
     title: '시간대별 점수',
-    allScoreData: saved?.data || {}, // 공통 점수 데이터
     currentUser: user,
-    adminList
+    adminList,
+    allScoreData: savedScore,
+    updatedAt: savedAt
   });
 });
 
