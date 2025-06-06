@@ -25,7 +25,7 @@
         <div class="text-center">
             <label class="form-label mb-1">주간 합산 점수</label><br>
             <input type="text" id="weeklyTotalScore" class="form-control text-center"
-                readonly style="width: 100px; background-color: #e5fa85; font-size: 1.4rem;">
+                readonly style="width: 100px; background-color: #e5fa85; font-size: 1rem;">
         </div>
         <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
             <button id="calculateButton" class="btn btn-primary">저장 하기</button>
