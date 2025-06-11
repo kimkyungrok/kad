@@ -119,21 +119,25 @@
         </tbody>
       </table>
     </div>
-
-
   </form>
 
   <!-- 하단 버튼 -->
-    <% if (['krogy', 'admin'].includes(user.username)) { %>
-      <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-center">
-        <button type="submit" class="btn btn-danger" style="font-size: 12px;" onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
-    <% } %>
-    <a href="/" class="btn btn-secondary" style="font-size: 12px;">홈으로</a>
-    <% if (['krogy', 'admin'].includes(user.username)) { %>
-      <a href="/write" class="btn btn-primary" style="font-size: 12px;">정산서 등록</a>
-    <% } %>
+  <% const isAdmin = ['krogy', 'admin'].includes(user.username); %>
+  <div class="mt-4 d-flex justify-content-center">
+    <div class="btn-group btn-group-sm w-100" role="group" aria-label="하단 버튼 그룹">
+      <% if (isAdmin) { %>
+        <button type="submit" class="btn btn-danger flex-fill" style="font-size: 12px;"
+          onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
+      <% } %>
+
+      <a href="/welcome" class="btn btn-secondary flex-fill" style="font-size: 12px;">홈으로</a>
+
+      <% if (isAdmin) { %>
+        <a href="/write" class="btn btn-primary flex-fill" style="font-size: 12px;">정산서 등록</a>
+      <% } %>
+    </div>
   </div>
-</div>
+
 
 <script>
   // 전체 선택
