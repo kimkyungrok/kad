@@ -15,41 +15,42 @@
     <!-- 2행: 지표 + 점수 + 버튼 -->
     <div class="row mt-2 gy-2 gx-3 align-items-center">
       <!-- 주간 수행 지표 -->
-      <div class="col-4 col-md-auto">
-        <label class="form-label mb-0 me-2" style="font-size: 12px;">주간 수행량</label>
+      <div class="col-2 col-md-auto">
+        <label class="form-label mb-0 me-2" style="font-size: 12px;">주간<br>수행량</label>
         <input type="text" id="weeklyTotalCount" class="form-control form-control-sm text-end" readonly style="font-size: 12px;">
       </div>
-      <div class="col-4 col-md-auto">
-        <label class="form-label mb-0 me-2" style="font-size: 12px;">거절 및 배차취소</label>
+      <div class="col-2 col-md-auto">
+        <label class="form-label mb-0 me-2" style="font-size: 12px;">거절/배차<br>취소 건수</label>
         <input type="text" id="weeklyCancelScore" class="form-control form-control-sm text-end" readonly style="font-size: 12px;">
       </div>
-      <div class="col-4 col-md-auto">
-        <label class="form-label mb-0 me-2" style="font-size: 12px;">주간 수행율</label>
+      <div class="col-2 col-md-auto">
+        <label class="form-label mb-0 me-2" style="font-size: 12px;">주간<br>수행율</label>
         <input type="text" id="weeklyAchievement" class="form-control form-control-sm text-end" readonly style="font-size: 12px;">
       </div>
 
       <!-- 수행율 점수 -->
-      <div class="col-3 col-md-auto">
-        <label class="form-label mb-0 me-2" style="font-size: 12px;">주간 수행 점수</label>
+      <div class="col-2 col-md-auto">
+        <label class="form-label mb-0 me-2" style="font-size: 12px;">주간 수행<br>점수</label>
         <input type="text" id="weeklyAchievementScore" class="form-control form-control-sm text-end" readonly style="font-size: 12px;">
       </div>
 
       <!-- 시간대 점수 -->
-      <div class="col-3 col-md-auto">
-        <label class="form-label mb-0 me-2" style="font-size: 12px;">시간대 점수</label>
+      <div class="col-2 col-md-auto">
+        <label class="form-label mb-0 me-2" style="font-size: 12px;">시간대<br>점수</label>
         <input type="text" id="weeklyTimeSlotScore" class="form-control form-control-sm text-end" readonly style="font-size: 12px;">
       </div>
 
       <!-- 합산 점수 -->
-      <div class="col-3 col-md-auto">
+      <div class="col-2 col-md-auto">
         <label class="form-label mb-0 me-2" style="font-size: 12px;">주간 합산 점수</label>
         <input type="text" id="weeklyTotalScore" class="form-control text-center" readonly style="background-color: #e5fa85;font-size: 12px;">
       </div>
 
       <!-- 저장 버튼 -->
       <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
-      <div class="col-3 col-md-auto">
-        <button id="calculateButton" class="btn btn-primary mt-4" style="font-size: 12px;">저장 하기</button>
+      <div class="col-0 col-md-auto btn-group">
+        <button id="calculateButton" class="btn btn-primary mt-4" style="font-size: 12px; width: 50px">저장 하기</button>
+        <button id="resetButton" class="btn btn-danger mt-4" style="font-size: 12px;">초기화</button>
       </div>
       <% } %>
     </div>
@@ -312,4 +313,47 @@
 
     runAllCalculations();
   });
+
+  const resetBtn = document.getElementById("resetButton");
+if (resetBtn) {
+  resetBtn.addEventListener("click", () => {
+    if (!confirm("정말 모든 입력값을 초기화하시겠습니까?")) return;
+
+    days.forEach(day => {
+      for (let i = 1; i <= 4; i++) {
+        const actualInput = document.querySelector(`input[name="${day}Cnt${i}"]`);
+        const valueInput = document.querySelector(`input[name="${day}Value${i}"]`);
+        if (actualInput) actualInput.value = "0";
+        if (valueInput) valueInput.value = "0";
+      }
+
+      const deniedInput = document.querySelector(`input[name="${day}Denied"]`);
+      const cancelInput = document.querySelector(`input[name="${day}Cancel"]`);
+      const totalInput = document.querySelector(`input[name="${day}Total"]`);
+
+      if (deniedInput) deniedInput.value = "0";
+      if (cancelInput) cancelInput.value = "0";
+      if (totalInput) totalInput.value = "0";
+    });
+
+    // 상단 주간 점수 입력칸들도 초기화
+    const weeklyIds = [
+      "weeklyTotalCount",
+      "weeklyCancelScore",
+      "weeklyAchievement",
+      "weeklyAchievementScore",
+      "weeklyTimeSlotScore",
+      "weeklyTotalScore"
+    ];
+    weeklyIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "0";
+    });
+
+    // 최종 저장 시간 제거
+    document.getElementById("finalRegScoreTime").innerText = "";
+  });
+}
+
+
 </script>
