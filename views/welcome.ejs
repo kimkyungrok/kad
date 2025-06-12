@@ -17,7 +17,54 @@
     <% } %>
   </div>
 
-  <!-- 파일 업로드 (krogy, admin 전용) -->
+  <!-- 진행중인 이벤트 카드 -->
+  <% if (activeEvent) { %>
+    <div class="mx-auto mb-5" style="max-width: 600px; position: relative;">
+      <!-- 수령 완료 알림창 -->
+      <div id="claimSuccessAlert" class="alert alert-success alert-dismissible fade d-none" role="alert"
+           style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px;">
+        🎉 수령 완료되었습니다!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <!-- 직원용 안내창 -->
+      <div id="staffAlert" class="alert alert-info alert-dismissible fade d-none" role="alert"
+           style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px;">
+        매장 직원에 보여주세요.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
+      <div class="card shadow border-start border-primary border-4 rounded-3">
+        <div class="card-body text-center">
+          <h5 class="card-title fw-bold text-primary">진행중인 이벤트</h5>
+          <p><strong><%= activeEvent.title %></strong></p>
+          <p><strong><%= activeEvent.item %></strong></p>
+          <p><strong>남은 수량:</strong> <span id="remainingCount"><%= activeEvent.quantity %></span>개</p>
+
+          <!-- 버튼 & 메시지 영역 -->
+          <div id="actionSection">
+            <% if (activeEvent.quantity <= 0) { %>
+              <p id="endMessage" class="mt-2 text-danger fw-bold">이벤트가 종료되었습니다.</p>
+            <% } else { %>
+              <button id="showCodeBtn" class="btn btn-outline-success btn-sm mt-2" onclick="showCodeInput()" style="width: 50%;">이벤트 수령</button>
+              <div id="codeSection" class="mt-3" style="display: none;">
+                <input type="text"
+                       id="codeInput"
+                       placeholder="확인 코드 입력"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       style="width: 50%; margin: 0 auto; display: block; padding: 0.375rem 0.75rem; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                <button id="submitCodeBtn" class="btn btn-primary btn-sm" onclick="submitCode()" style="width: 50%; margin: 0.5rem auto 0; display: block;">수령 확인</button>
+                <div id="codeMessage" class="mt-2 fw-bold text-center"></div>
+              </div>
+            <% } %>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- 파일 업로드 -->
   <% if (user.username === 'krogy' || user.username === 'admin') { %>
     <div class="mx-auto mb-5" style="max-width: 600px;">
       <div class="card shadow rounded-3">
@@ -34,7 +81,7 @@
     </div>
   <% } %>
 
-  <!-- 업로드된 이미지 미리보기 (모든 유저에게 보여줌) -->
+  <!-- 업로드된 이미지 표시 -->
   <% if (uploadedImagePath) { %>
     <div class="mx-auto mb-5" style="max-width: 600px;">
       <div class="card shadow rounded-3">
@@ -46,12 +93,75 @@
     </div>
   <% } %>
 
-  <!-- 이동 버튼 (주석 해제 가능) -->
-  <!--
-  <div class="text-center mt-4">
-    <a href="/my-posts" class="btn btn-primary w-100 w-sm-auto mb-2">게시판 이동</a>
-    <a href="/logout" class="btn btn-secondary w-100 w-sm-auto ms-sm-2">로그아웃</a>
-  </div>
-  -->
-
 </div>
+
+<script>
+  function showCodeInput() {
+    document.getElementById('codeSection').style.display = 'block';
+    document.getElementById('codeMessage').innerText = '';
+
+    // 직원 안내창
+    const staffBox = document.getElementById('staffAlert');
+    staffBox.classList.remove('d-none');
+    staffBox.classList.add('show');
+    setTimeout(() => { bootstrap.Alert.getOrCreateInstance(staffBox).close(); }, 5000);
+  }
+
+  function submitCode() {
+    const code = document.getElementById('codeInput').value.trim();
+    const messageEl = document.getElementById('codeMessage');
+    const alertBox = document.getElementById('claimSuccessAlert');
+    const codeSection = document.getElementById('codeSection');
+    const remainingEl = document.getElementById('remainingCount');
+    const showBtn = document.getElementById('showCodeBtn');
+    const endMessage = document.getElementById('endMessage');
+
+    if (code !== '51421262') {
+      messageEl.innerText = '❌ 확인 코드가 올바르지 않습니다.';
+      messageEl.className = 'text-danger fw-bold';
+      return;
+    }
+
+    fetch('/claim-event', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: '<%= user.username %>', date: new Date().toISOString() })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // 수량 갱신
+        remainingEl.innerText = data.newQuantity;
+        // 입력 섹션 숨김
+        codeSection.style.display = 'none';
+        document.getElementById('codeInput').value = '';
+
+        // 수령 완료 알림
+        alertBox.classList.remove('d-none');
+        alertBox.classList.add('show');
+        setTimeout(() => { bootstrap.Alert.getOrCreateInstance(alertBox).close(); }, 5000);
+
+        // 수량 0 시 버튼 숨기고 메시지 표시
+        if (data.newQuantity <= 0) {
+          showBtn.style.display = 'none';
+          if (endMessage) {
+            endMessage.style.display = 'block';
+          } else {
+            // 동적 생성
+            const msg = document.createElement('p');
+            msg.className = 'mt-2 text-danger fw-bold';
+            msg.innerText = '이벤트가 종료되었습니다.';
+            document.getElementById('actionSection').appendChild(msg);
+          }
+        }
+      } else {
+        messageEl.innerText = data.message || '처리 실패';
+        messageEl.className = 'text-danger fw-bold';
+      }
+    })
+    .catch(err => {
+      console.error('요청 실패:', err);
+      messageEl.innerText = '서버 오류';
+      messageEl.className = 'text-danger fw-bold';
+    });
+  }
+</script>

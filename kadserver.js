@@ -65,7 +65,23 @@ new MongoClient(url)
   .catch(err => {
     console.error('DB 연결 에러:', err);
   });
- 
+
+
+// 이벤트 이미지 업로드용 multer 설정
+const eventStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/events/');
+  },
+  filename: (req, file, cb) => {
+    const now = new Date(Date.now() + 9 * 60 * 60 * 1000); // 한국 시간
+    const D = n => n.toString().padStart(2, '0');
+    const datePart = `${now.getFullYear()}${D(now.getMonth() + 1)}${D(now.getDate())}`;
+    const timePart = `${D(now.getHours())}${D(now.getMinutes())}${D(now.getSeconds())}`;
+    cb(null, `event_${datePart}_${timePart}${path.extname(file.originalname)}`);
+  }
+});
+
+const eventUpload = multer({ storage: eventStorage });
 
 // 로그인 필요 미들웨어
 function 로그인필요(req, res, next) {
@@ -120,16 +136,19 @@ app.get('/register', (req, res) => {
 app.get('/welcome', 로그인필요, async (req, res) => {
   const currentUser = req.session.user;
 
-  // site_settings에서 최신 업로드된 이미지를 가져옴
   const setting = await db.collection('site_settings').findOne({ key: 'latestWelcomeImage' });
   const uploadedImagePath = setting ? setting.value : null;
+
+  const activeEvent = await db.collection('events').findOne({ status: 'active' });
 
   res.render('welcome', {
     title: '환영 페이지',
     user: currentUser,
-    uploadedImagePath  // 모든 유저에게 공통으로 넘겨줌!
+    uploadedImagePath,
+    activeEvent  // ✅ 진행중 이벤트 1개 전달
   });
 });
+
 
 
 
@@ -1174,5 +1193,102 @@ app.post('/find-password', async (req, res) => {
     res.status(500).send('서버 오류');
   }
 });
-
 // 메일 발송자 설정 (예: Gmail 기준)
+
+app.get('/SetEvent', 로그인필요, isAdmin, async (req, res) => {
+  try {
+    const [activeEvents, doneEvents] = await Promise.all([
+      db.collection('events').find({ status: 'active' }).sort({ createdAt: -1 }).toArray(),
+      db.collection('events').find({ status: 'done' }).sort({ completedAt: -1 }).toArray()
+    ]);
+
+    res.render('SetEvent', {
+      title: '이벤트 등록',
+      activeEvents,
+      doneEvents
+    });
+  } catch (err) {
+    console.error('이벤트 목록 로딩 오류:', err);
+    res.status(500).send('서버 오류');
+  }
+});
+
+app.post('/set-event', 로그인필요, isAdmin, eventUpload.single('Eventimage'), async (req, res) => {
+  try {
+    // 1. 기존 진행중인 이벤트가 있다면 완료 처리
+    await db.collection('events').updateMany(
+      { status: 'active' },
+      { $set: { status: 'done', completedAt: new Date() } }
+    );
+
+    // 2. 새 이벤트 등록
+    const {
+      title, item, quantity, type,
+      description, startDate, endDate
+    } = req.body;
+
+    const imagePath = req.file ? '/uploads/events/' + req.file.filename : null;
+    const nowKST = new Date(Date.now() + 9 * 60 * 60 * 1000);
+
+    const newEvent = {
+      title,
+      item,
+      quantity: parseInt(quantity),
+      type,
+      description,
+      imagePath,
+      status: 'active', // 진행중 이벤트로 등록
+      createdAt: nowKST,
+      createdBy: req.session.user.username
+    };
+
+    if (type === '기간 한정') {
+      newEvent.startDate = new Date(startDate);
+      newEvent.endDate = new Date(endDate);
+    }
+
+    await db.collection('events').insertOne(newEvent);
+    res.redirect('/SetEvent');
+
+  } catch (err) {
+    console.error('이벤트 등록 오류:', err);
+    res.status(500).send('서버 오류 발생');
+  }
+});
+
+// 이벤트 수령 처리 및 클레임 기록 저장
+app.post('/claim-event', 로그인필요, async (req, res) => {
+  try {
+    // 1. 로그인된 유저 정보와 현재 시각
+    const userId    = req.session.user.username;
+    const claimedAt = new Date();
+
+    // 2. 진행중인 이벤트 조회
+    const eventsCol = db.collection('events');
+    const event     = await eventsCol.findOne({ status: 'active' });
+
+    if (!event || event.quantity <= 0) {
+      return res.json({ success: false, message: '이벤트 종료 또는 수량 없음' });
+    }
+
+    // 3. 이벤트 수량 차감
+    const newQuantity = event.quantity - 1;
+    await eventsCol.updateOne(
+      { _id: event._id },
+      { $set: { quantity: newQuantity } }
+    );
+
+    // 4. 클레임 기록 저장
+    await db.collection('claims').insertOne({
+      eventId:   event._id,
+      userId,                // 세션에서 읽은 사용자 아이디
+      claimedAt              // 현재 시각
+    });
+
+    // 5. 결과 반환
+    res.json({ success: true, newQuantity });
+  } catch (err) {
+    console.error('이벤트 수령 처리 오류:', err);
+    res.status(500).json({ success: false, message: '서버 오류' });
+  }
+});
