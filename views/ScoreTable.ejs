@@ -80,6 +80,12 @@
         <div class="card h-100">
           <div class="card-header text-center fw-bold" style="background-color: #f1f3ff;">
             <%= labels[day] %>
+              <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    style="margin-left: auto;"
+                    onclick="resetDay('<%= day %>')">
+              초기화
+            </button>
           </div>
           <div class="card-body p-2 table-responsive">
             <table class="table table-bordered align-middle mb-0">
@@ -353,6 +359,27 @@ if (resetBtn) {
     // 최종 저장 시간 제거
     document.getElementById("finalRegScoreTime").innerText = "";
   });
+}
+
+/**
+ * 해당 요일의 Cnt, Value, Denied, Cancel, Total 입력만 비웁니다.
+ */
+function resetDay(day) {
+  if (!confirm(`${day} 초기화하시겠습니까?`)) return;
+  // 운행 건수 및 점수
+  for (let i = 1; i <= 4; i++) {
+    document.querySelector(`[name="${day}Cnt${i}"]`).value = '0';
+    document.querySelector(`[name="${day}Value${i}"]`).value = '0';
+    if (cntEl) cntEl.value   = '0';
+    if (valEl) valEl.value   = '0';
+  }
+  // 거절/취소/총점
+  ['Denied', 'Cancel', 'Total'].forEach(suffix => {
+    const el = document.querySelector(`[name="${day}${suffix}"]`);
+    if (el) el.value = '0';
+  });
+  // 다시 전체 계산
+  runAllCalculations();
 }
 
 
