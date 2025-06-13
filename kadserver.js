@@ -1301,3 +1301,16 @@ app.post('/claim-event', 로그인필요, async (req, res) => {
     res.status(500).json({ success: false, message: '서버 오류' });
   }
 });
+
+app.post('/delete-event/:id', 로그인필요, isAdmin, async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    await db.collection('events').deleteOne({ _id: new ObjectId(eventId) });
+    console.log(`🗑️ 이벤트 삭제 완료: ${eventId}`);
+    // 삭제 후 다시 SetEvent 페이지로 리다이렉트
+    res.redirect('/SetEvent');
+  } catch (err) {
+    console.error('❌ 이벤트 삭제 오류:', err);
+    res.status(500).send('이벤트 삭제 중 서버 오류 발생');
+  }
+});

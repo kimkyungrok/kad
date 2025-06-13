@@ -15,6 +15,7 @@
             <th>진행 형태</th>
             <th>시작일</th>
             <th>종료일</th>
+            <th>관리</th>
           </tr>
         </thead>
         <tbody>
@@ -24,8 +25,24 @@
               <td><%= event.item %></td>
               <td><%= event.quantity %></td>
               <td><%= event.type %></td>
-              <td><%= event.type === '기간 한정' && event.startDate ? event.startDate.toISOString().slice(0, 10) : '' %></td>
-              <td><%= event.type === '기간 한정' && event.endDate ? event.endDate.toISOString().slice(0, 10) : '' %></td>
+              <td>
+                <%= event.type === '기간 한정' && event.startDate
+                     ? event.startDate.toISOString().slice(0, 10)
+                     : '' %>
+              </td>
+              <td>
+                <%= event.type === '기간 한정' && event.endDate
+                     ? event.endDate.toISOString().slice(0, 10)
+                     : '' %>
+              </td>
+              <td>
+                <form action="/delete-event/<%= event._id %>" method="POST"
+                      onsubmit="return confirm('정말 이 이벤트를 삭제하시겠습니까?');">
+                  <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="bi bi-trash-fill me-1"></i>삭제
+                  </button>
+                </form>
+              </td>
             </tr>
           <% }) %>
         </tbody>
@@ -56,9 +73,21 @@
               <td><%= event.item %></td>
               <td><%= event.quantity %></td>
               <td><%= event.type %></td>
-              <td><%= event.type === '기간 한정' && event.startDate ? event.startDate.toISOString().slice(0, 10) : '' %></td>
-              <td><%= event.type === '기간 한정' && event.endDate ? event.endDate.toISOString().slice(0, 10) : '' %></td>
-              <td><%= event.completedAt ? event.completedAt.toISOString().slice(0, 10) : '' %></td>
+              <td>
+                <%= event.type === '기간 한정' && event.startDate
+                     ? event.startDate.toISOString().slice(0, 10)
+                     : '' %>
+              </td>
+              <td>
+                <%= event.type === '기간 한정' && event.endDate
+                     ? event.endDate.toISOString().slice(0, 10)
+                     : '' %>
+              </td>
+              <td>
+                <%= event.completedAt
+                     ? event.completedAt.toISOString().slice(0, 10)
+                     : '' %>
+              </td>
             </tr>
           <% }) %>
         </tbody>
@@ -118,27 +147,22 @@
     </div>
 
     <div class="text-center mt-4">
-      <button type="submit" class="btn btn-primary px-5">이벤트 등록</button>
+      <button type="submit" class="btn btn-primary px-5">
+        <i class="bi bi-plus-circle me-1"></i>이벤트 등록
+      </button>
     </div>
   </form>
 </div>
 
 <script>
   function toggleDateFields() {
-    const eventType = document.getElementById('eventType').value;
-    const startRow = document.getElementById('startDateRow');
-    const endRow = document.getElementById('endDateRow');
-
-    if (eventType === '기간 한정') {
-      startRow.style.display = '';
-      endRow.style.display = '';
-    } else {
-      startRow.style.display = 'none';
-      endRow.style.display = 'none';
-      startRow.querySelector('input').value = '';
-      endRow.querySelector('input').value = '';
+    const type = document.getElementById('eventType').value;
+    document.getElementById('startDateRow').style.display = type === '기간 한정' ? '' : 'none';
+    document.getElementById('endDateRow').style.display   = type === '기간 한정' ? '' : 'none';
+    if (type !== '기간 한정') {
+      document.querySelector('#startDateRow input').value = '';
+      document.querySelector('#endDateRow input').value   = '';
     }
   }
-
   document.addEventListener('DOMContentLoaded', toggleDateFields);
 </script>
