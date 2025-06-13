@@ -1,7 +1,6 @@
 <% layout('layout') %>
-<div class="top-bar" >
+<div class="top-bar">
   <div class="container">
-    
     <!-- 1행: 제목 + 최종 시간 -->
     <div class="row mt-2 gy-2 gx-3">
       <div class="col-6 col-md-auto">
@@ -45,13 +44,31 @@
         <label class="form-label mb-0 me-2" style="font-size: 12px;">주간 합산 점수</label>
         <input type="text" id="weeklyTotalScore" class="form-control text-center" readonly style="background-color: #e5fa85;font-size: 12px;">
       </div>
+    </div>
 
-      <!-- 저장 버튼 -->
       <% if (adminList.some(admin => admin.username === currentUser?.username)) { %>
-      <div class="col-0 col-md-auto btn-group">
-        <button id="calculateButton" class="btn btn-primary mt-4" style="font-size: 12px; width: 50px">저장 하기</button>
-        <button id="resetButton" class="btn btn-danger mt-4" style="font-size: 12px;">초기화</button>
-      </div>
+        <div class="row mt-2 justify-content-center">
+          <div class="col-auto">
+            <div class="btn-group" role="group" aria-label="저장 및 초기화">
+              <button
+                id="calculateButton"
+                type="button"
+                class="btn btn-primary btn-sm mb-1"
+                style="font-size:12px; width:150px; height:36px;"
+              >
+                <i class="bi bi-save me-1"></i>저장
+              </button>
+              <button
+                id="resetButton"
+                type="button"
+                class="btn btn-danger btn-sm"
+                style="font-size:12px; width:150px; height:36px;"
+              >
+                <i class="bi bi-arrow-repeat me-1"></i>초기화
+              </button>
+            </div>
+          </div>
+        </div>
       <% } %>
     </div>
   </div>
@@ -60,31 +77,33 @@
 <div class="main-content">
   <div class="container-fluid">
     <div class="row g-4 mt-3" style="font-size: 14px;">
-      <% const days = ['Wednesday','Thursday','Friday','Saturday','Sunday','Monday','Tuesday'];
-         const labels = {
-           'Wednesday':'수요일','Thursday':'목요일','Friday':'금요일','Saturday':'토요일',
-           'Sunday':'일요일','Monday':'월요일','Tuesday':'화요일'
-         };
-         const goals = {
-           'Wednesday':[21,20,30,29],
-           'Thursday':[21,20,30,29],
-           'Friday':[24,21,32,33],
-           'Saturday':[31,22,36,31],
-           'Sunday':[33,22,35,30],
-           'Monday':[21,20,30,29],
-           'Tuesday':[21,20,30,29],
-         };
+      <% 
+        const days = ['Wednesday','Thursday','Friday','Saturday','Sunday','Monday','Tuesday'];
+        const labels = {
+          'Wednesday':'수요일','Thursday':'목요일','Friday':'금요일','Saturday':'토요일',
+          'Sunday':'일요일','Monday':'월요일','Tuesday':'화요일'
+        };
+        const goals = {
+          'Wednesday':[21,20,30,29],
+          'Thursday':[21,20,30,29],
+          'Friday':[24,21,32,33],
+          'Saturday':[31,22,36,31],
+          'Sunday':[33,22,35,30],
+          'Monday':[21,20,30,29],
+          'Tuesday':[21,20,30,29],
+        };
       %>
-      <% for (let day of days) { %>
+      <% days.forEach(day => { %>
       <div class="col-12 col-md-6 col-lg-4">
         <div class="card h-100">
-          <div class="card-header text-center fw-bold" style="background-color: #f1f3ff;">
-            <%= labels[day] %>
-              <button type="button"
-                    class="btn btn-sm btn-outline-secondary"
-                    style="margin-left: auto;"
-                    onclick="resetDay('<%= day %>')">
-              초기화
+          <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f1f3ff;">
+            <span><%= labels[day] %></span>
+            <button 
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              onclick="resetDay('<%= day %>')"
+            >
+              <i class="bi bi-arrow-repeat me-1"></i>초기화
             </button>
           </div>
           <div class="card-body p-2 table-responsive">
@@ -98,37 +117,42 @@
                 </tr>
               </thead>
               <tbody>
-                <% const times = ['오전/점심 피크','오후 논 피크','저녁 피크','심야 논 피크']; %>
-                <% for (let i = 0; i < 4; i++) { %>
-                  <tr>
-                    <td class="text-center" style="font-size: 12px;"><%= times[i] %></td>
-                    <td style="background-color: #ffb9b9;">
-                      <input class="form-control text-center" style="background-color: #ffb9b9; font-size: 12px;" name="<%= day %>tg<%= i+1 %>" value="<%= goals[day][i] %>" readonly>
-                    </td>
-                    <td style="background-color: #fffaa3;">
-                      <input class="form-control text-center" style="font-size: 12px;" name="<%= day %>Cnt<%= i+1 %>">
-                    </td>
-                    <td style="background-color: #cec5ff;">
-                      <input class="form-control text-center" style="background-color: #cec5ff; font-size: 12px;" name="<%= day %>Value<%= i+1 %>" readonly>
-                    </td>
-                  </tr>
-                <% } %>
+                <% ['오전/점심 피크','오후 논 피크','저녁 피크','심야 논 피크'].forEach((time, i) => { %>
+                <tr>
+                  <td class="text-center" style="font-size: 12px;"><%= time %></td>
+                  <td style="background-color: #ffb9b9;">
+                    <input class="form-control text-center" style="background-color: #ffb9b9; font-size: 12px;"
+                           name="<%= day %>tg<%= i+1 %>" value="<%= goals[day][i] %>" readonly>
+                  </td>
+                  <td style="background-color: #fffaa3;">
+                    <input class="form-control text-center" style="font-size: 12px;"
+                           name="<%= day %>Cnt<%= i+1 %>">
+                  </td>
+                  <td style="background-color: #cec5ff;">
+                    <input class="form-control text-center" style="background-color: #cec5ff; font-size: 12px;"
+                           name="<%= day %>Value<%= i+1 %>" readonly>
+                  </td>
+                </tr>
+                <% }) %>
                 <tr>
                   <td colspan="3" class="text-end" style="font-size: 12px;">거절</td>
-                  <td colspan="1" style="background-color: #ffb8b8;">
-                    <input class="form-control text-center" style="font-size: 12px;" name="<%= day %>Denied">
+                  <td style="background-color: #ffb8b8;">
+                    <input class="form-control text-center" style="font-size: 12px;"
+                           name="<%= day %>Denied">
                   </td>
                 </tr>
                 <tr>
                   <td colspan="3" class="text-end" style="font-size: 12px;">배차 취소</td>
-                  <td colspan="1" style="background-color: #d6f1ff;">
-                    <input class="form-control text-center" style="font-size: 12px;" name="<%= day %>Cancel">
+                  <td style="background-color: #d6f1ff;">
+                    <input class="form-control text-center" style="font-size: 12px;"
+                           name="<%= day %>Cancel">
                   </td>
                 </tr>
                 <tr>
                   <td colspan="1" class="text-center fw-bold" style="font-size: 14px;">일간 달성 점수</td>
                   <td colspan="3">
-                    <input class="form-control text-center" style="background-color: #ffadf8; font-size: 16px;" name="<%= day %>Total">
+                    <input class="form-control text-center" style="background-color: #ffadf8; font-size: 16px;"
+                           name="<%= day %>Total">
                   </td>
                 </tr>
               </tbody>
@@ -136,10 +160,36 @@
           </div>
         </div>
       </div>
-      <% } %>
+      <% }) %>
     </div>
   </div>
 </div>
+
+<script>
+/**
+ * 해당 요일의 필드 값들을 모두 "0"으로 초기화하고 재계산합니다.
+ */
+function resetDay(day) {
+  if (!confirm(`${day} 초기화하시겠습니까?`)) return;
+  // 운행 건수 및 점수
+  for (let i = 1; i <= 4; i++) {
+    const cnt = document.querySelector(`[name="${day}Cnt${i}"]`);
+    const val = document.querySelector(`[name="${day}Value${i}"]`);
+    if (cnt) cnt.value = '0';
+    if (val) val.value = '0';
+  }
+  // 거절/취소/총점
+  ['Denied', 'Cancel', 'Total'].forEach(suffix => {
+    const el = document.querySelector(`[name="${day}${suffix}"]`);
+    if (el) el.value = '0';
+  });
+  // 전체 계산 다시 실행
+  runAllCalculations();
+}
+
+// ... 이하 기존의 calculateDailyScore, runAllCalculations 등 JS 그대로 유지 ...
+</script>
+
 
 
 <script>
