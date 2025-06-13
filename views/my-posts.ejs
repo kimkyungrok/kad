@@ -44,46 +44,53 @@
   </div>
 
   <!-- 검색 기능 (관리자 전용) -->
-  <% if (['krogy', 'admin'].includes(user.username)) { %>
-  <div class="card mb-4">
-    <div class="card-body">
-      <h5 class="card-title">검색</h5>
-      <form method="GET" action="/my-posts">
-        <div class="row g-2">
-          <div class="col-md-4">
-            <select name="branch" class="form-select"  style="font-size: 12px;">
-              <option value="">전체 지사</option>
-              <option value="경산">경산</option>
-              <option value="시지">시지</option>
-              <option value="칠곡">칠곡</option>
-            </select>
+  <% const isAdmin = ['krogy', 'admin'].includes(user.username); %>
+  <% if (isAdmin) { %>
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">검색</h5>
+        <form method="GET" action="/my-posts">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <select name="branch" class="form-select" style="font-size: 12px;">
+                <option value="">전체 지사</option>
+                <option value="경산">경산</option>
+                <option value="시지">시지</option>
+                <option value="칠곡">칠곡</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <select name="username" class="form-select" style="font-size: 12px;">
+                <option value="">전체 라이더</option>
+                <% allUsers.forEach(u => { %>
+                  <option value="<%= u.username %>"><%= u.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <button type="submit" class="btn btn-primary w-100" style="font-size: 12px;">검색</button>
+            </div>
           </div>
-          <div class="col-md-4">
-            <select name="username" class="form-select" style="font-size: 12px;">
-              <option value="">전체 라이더</option>
-              <% allUsers.forEach(u => { %>
-                <option value="<%= u.username %>"><%= u.name %></option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100" style="font-size: 12px;">검색</button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </div>
   <% } %>
 
   <!-- 정산서 목록 -->
-  <h5 class="mb-4">정산서 목록 (<%= posts.length %>건)</h5>
+  <% 
+    // 관리자는 전체 posts, 그 외는 본인(riderName or username) 것만
+    const visiblePosts = isAdmin
+      ? posts
+      : posts.filter(p => p.riderName === user.name || p.username === user.username);
+  %>
+  <h5 class="mb-4">정산서 목록 (<%= visiblePosts.length %>건)</h5>
 
   <form id="deleteForm" method="POST" action="/delete-posts">
     <div class="table-responsive">
       <table class="table table-hover table-bordered align-middle text-center text-nowrap">
         <thead class="table-light" style="font-size: 12px;">
           <tr>
-            <% if (['krogy', 'admin'].includes(user.username)) { %>
+            <% if (isAdmin) { %>
               <th rowspan="2"><input type="checkbox" id="checkAll"></th>
             <% } %>
             <th>제목</th>
@@ -95,10 +102,10 @@
           </tr>
         </thead>
         <tbody>
-          <% posts.forEach(post => { %>
+          <% visiblePosts.forEach(post => { %>
             <tr style="font-size: 12px;">
-              <% if (['krogy', 'admin'].includes(user.username)) { %>
-                <td><input type="checkbox" name="deleteIds" value="<%= post._id %>" ></td>
+              <% if (isAdmin) { %>
+                <td><input type="checkbox" name="deleteIds" value="<%= post._id %>"></td>
               <% } %>
               <td><%= post.title %></td>
               <td><%= post.riderName %></td>
@@ -122,7 +129,6 @@
   </form>
 
   <!-- 하단 버튼 -->
-  <% const isAdmin = ['krogy', 'admin'].includes(user.username); %>
   <div class="mt-4 d-flex justify-content-center">
     <div class="btn-group btn-group-sm w-100" role="group" aria-label="하단 버튼 그룹">
       <% if (isAdmin) { %>
@@ -138,11 +144,11 @@
     </div>
   </div>
 
+</div>
 
 <script>
   // 전체 선택
   document.getElementById('checkAll')?.addEventListener('change', function () {
-    const checkboxes = document.querySelectorAll('input[name="deleteIds"]');
-    checkboxes.forEach(cb => cb.checked = this.checked);
+    document.querySelectorAll('input[name="deleteIds"]').forEach(cb => cb.checked = this.checked);
   });
 </script>

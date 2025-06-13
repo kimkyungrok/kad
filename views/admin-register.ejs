@@ -17,26 +17,58 @@
       </div>
     </div>
     
-    
-    <h4 class="mb-3"></h4>
     <h4 class="mb-3">관리자 현황</h4>
 
     <!-- PC -->
     <div class="table-responsive d-none d-md-block">
       <table class="table table-bordered text-center">
         <thead class="table-light">
-          <tr><th>이름</th><th>아이디</th><th>관리</th></tr>
+          <tr>
+            <th>이름</th>
+            <th>아이디</th>
+            <th>관리</th>
+          </tr>
         </thead>
         <tbody>
           <% if (adminList.length === 0) { %>
-            <tr><td colspan="3">등록된 관리자가 없습니다.</td></tr>
+            <tr>
+              <td colspan="3">등록된 관리자가 없습니다.</td>
+            </tr>
           <% } else { %>
             <% adminList.forEach(admin => { %>
               <tr>
                 <td><%= admin.name %></td>
                 <td><%= admin.username %></td>
                 <td>
-                  <button type="button" class="btn btn-outline-danger" onclick="deleteAdmin('<%= admin.username %>')">삭제</button>
+                  <% if (admin.username === 'admin') { %>
+                    <!-- 기본 관리자 계정은 삭제 불가 -->
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      disabled
+                      title="기본 관리자 계정은 삭제할 수 없습니다."
+                    >
+                      삭제
+                    </button>
+                  <% } else if (user.username === 'admin') { %>
+                    <!-- 로그인한 사용자가 admin일 때만 나머지 계정 삭제 가능 -->
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      onclick="deleteAdmin('<%= admin.username %>')"
+                    >
+                      삭제
+                    </button>
+                  <% } else { %>
+                    <!-- 그 외 모든 경우 비활성화 -->
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      disabled
+                    >
+                      삭제
+                    </button>
+                  <% } %>
                 </td>
               </tr>
             <% }) %>
@@ -55,7 +87,34 @@
             <div class="card-body">
               <p><strong>이름:</strong> <%= admin.name %></p>
               <p><strong>아이디:</strong> <%= admin.username %></p>
-              <button type="button" class="btn btn-outline-danger " onclick="deleteAdmin('<%= admin.username %>')">삭제</button>
+
+              <% if (admin.username === 'admin') { %>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  disabled
+                  title="기본 관리자 계정은 삭제할 수 없습니다."
+                >
+                  삭제
+                </button>
+              <% } else if (user.username === 'admin') { %>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  onclick="deleteAdmin('<%= admin.username %>')"
+                >
+                  삭제
+                </button>
+              <% } else { %>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  disabled
+                >
+                  삭제
+                </button>
+              <% } %>
+              
             </div>
           </div>
         <% }) %>
@@ -81,7 +140,6 @@
   async function addAdmin() {
     const name = document.getElementById('adminNameInput').value.trim();
     const username = document.getElementById('adminIdInput').value.trim();
-
     if (!name || !username) return alert('이름과 아이디를 모두 입력해주세요.');
 
     try {
@@ -90,7 +148,6 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, username })
       });
-
       const text = await res.text();
       if (res.ok) location.reload();
       else alert('❌ 추가 실패: ' + text);
@@ -103,14 +160,12 @@
   // 관리자 삭제
   async function deleteAdmin(username) {
     if (!confirm(`'${username}' 관리자를 삭제하시겠습니까?`)) return;
-
     try {
       const res = await fetch('/admin-register/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username })
       });
-
       const text = await res.text();
       if (res.ok) location.reload();
       else alert('❌ 삭제 실패: ' + text);

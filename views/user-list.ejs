@@ -8,7 +8,8 @@
     <div class="col-12 col-md-4 mb-2">
       <select id="branchFilter" class="form-select">
         <option value="">전체 지사</option>
-        <% const branches = [...new Set(users.map(u => u.branch))]; branches.forEach(branch => { %>
+        <% const branches = [...new Set(users.map(u => u.branch))];
+           branches.forEach(branch => { %>
           <option value="<%= branch %>"><%= branch %></option>
         <% }) %>
       </select>
@@ -37,20 +38,26 @@
           </tr>
         </thead>
         <tbody id="userTableBody">
-          <% users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(user => { %>
+          <% users
+               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+               .forEach(u => { %>
             <tr>
-              <td><%= user.username %></td>
-              <td><%= user.name %></td>
-              <td><%= user.connectId %></td>
-              <td><%= user.phone %></td>
-              <td><%= user.branch %></td>
-              <td><%= new Date(user.createdAt).toLocaleDateString('ko-KR') %></td>
+              <td><%= u.username %></td>
+              <td><%= u.name %></td>
+              <td><%= u.connectId %></td>
+              <td><%= u.phone %></td>
+              <td><%= u.branch %></td>
+              <td><%= new Date(u.createdAt).toLocaleDateString('ko-KR') %></td>
               <td>
                 <div class="d-flex flex-column gap-1">
-                  <a href="/edit-user/<%= user._id %>" class="btn btn-sm btn-warning">수정</a>
-                  <form action="/delete-user/<%= user._id %>" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?')">
-                    <button type="submit" class="btn btn-sm btn-danger">삭제</button>
-                  </form>
+                  <a href="/edit-user/<%= u._id %>" class="btn btn-sm btn-warning">수정</a>
+                  <% // 'admin' 계정은, 로그인 유저가 admin 아닐 땐 삭제 버튼 숨김 %>
+                  <% if (!(u.username === 'admin' && user.username !== 'admin')) { %>
+                    <form action="/delete-user/<%= u._id %>" method="POST"
+                          onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                      <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+                    </form>
+                  <% } %>
                 </div>
               </td>
             </tr>
@@ -61,19 +68,24 @@
 
     <!-- 모바일 카드 -->
     <div class="d-block d-md-none" id="mobileCardList">
-      <% users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(user => { %>
+      <% users
+           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+           .forEach(u => { %>
         <div class="card mb-3 user-card">
           <div class="card-body">
-            <h5 class="card-title"><%= user.name %> (<%= user.username %>)</h5>
-            <p><strong>배민커넥트 ID:</strong> <%= user.connectId %></p>
-            <p><strong>전화번호:</strong> <%= user.phone %></p>
-            <p><strong>가입 지사:</strong> <%= user.branch %></p>
-            <p><strong>가입일:</strong> <%= new Date(user.createdAt).toLocaleDateString('ko-KR') %></p>
+            <h5 class="card-title"><%= u.name %> (<%= u.username %>)</h5>
+            <p><strong>배민커넥트 ID:</strong> <%= u.connectId %></p>
+            <p><strong>전화번호:</strong> <%= u.phone %></p>
+            <p><strong>가입 지사:</strong> <%= u.branch %></p>
+            <p><strong>가입일:</strong> <%= new Date(u.createdAt).toLocaleDateString('ko-KR') %></p>
             <div class="d-flex gap-2 mt-2">
-              <a href="/edit-user/<%= user._id %>" class="btn btn-sm btn-warning w-50">수정</a>
-              <form action="/delete-user/<%= user._id %>" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?')" class="w-50">
-                <button type="submit" class="btn btn-sm btn-danger w-100">삭제</button>
-              </form>
+              <a href="/edit-user/<%= u._id %>" class="btn btn-sm btn-warning w-50">수정</a>
+              <% if (!(u.username === 'admin' && user.username !== 'admin')) { %>
+                <form action="/delete-user/<%= u._id %>" method="POST"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?')" class="w-50">
+                  <button type="submit" class="btn btn-sm btn-danger w-100">삭제</button>
+                </form>
+              <% } %>
             </div>
           </div>
         </div>
@@ -105,20 +117,20 @@
       const username = row.children[0].textContent.toLowerCase();
       const name = row.children[1].textContent.toLowerCase();
       const branch = row.children[4].textContent;
-      const visible = (!selectedBranch || branch === selectedBranch) &&
-                      (username.includes(searchText) || name.includes(searchText));
-      row.style.display = visible ? '' : 'none';
+      row.style.display = ((!selectedBranch || branch === selectedBranch) &&
+                           (username.includes(searchText) || name.includes(searchText)))
+                          ? '' : 'none';
     });
 
     // 카드
     document.querySelectorAll('#mobileCardList .user-card').forEach(card => {
-      const nameLine = card.querySelector('.card-title').textContent;
-      const name = nameLine.split('(')[0].trim().toLowerCase();
-      const username = nameLine.split('(')[1].replace(')', '').toLowerCase();
+      const title = card.querySelector('.card-title').textContent;
+      const [nameText, usernameText] = title.match(/(.+)\s\((.+)\)/).slice(1);
       const branch = card.querySelector('p:nth-of-type(3)').textContent.replace('가입 지사:', '').trim();
-      const visible = (!selectedBranch || branch === selectedBranch) &&
-                      (username.includes(searchText) || name.includes(searchText));
-      card.style.display = visible ? '' : 'none';
+      const show = (!selectedBranch || branch === selectedBranch) &&
+                   (usernameText.toLowerCase().includes(searchText) ||
+                    nameText.toLowerCase().includes(searchText));
+      card.style.display = show ? '' : 'none';
     });
   }
 
@@ -132,23 +144,10 @@
 <!-- 모바일 최적화 -->
 <style>
   @media (max-width: 576px) {
-    .table th, .table td {
-      font-size: 13px;
-      padding: 8px;
-    }
-    .btn-sm {
-      font-size: 13px;
-      padding: 6px 10px;
-    }
-    .form-select, .form-control, .btn {
-      font-size: 14px;
-    }
-    .card-title {
-      font-size: 16px;
-    }
-    .user-card p {
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
+    .table th, .table td { font-size: 13px; padding: 8px; }
+    .btn-sm { font-size: 13px; padding: 6px 10px; }
+    .form-select, .form-control, .btn { font-size: 14px; }
+    .card-title { font-size: 16px; }
+    .user-card p { margin-bottom: 4px; font-size: 14px; }
   }
 </style>

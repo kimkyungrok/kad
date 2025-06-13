@@ -40,44 +40,62 @@
 
         <li class="nav-item"><a class="nav-link" href="/welcome">홈</a></li>
         <li class="nav-item"><a class="nav-link" href="/my-posts">정산서 확인</a></li>
+
         <% if (!user) { %>
+          <!-- 비로그인 -->
           <li class="nav-item"><a class="nav-link" href="/register">회원가입</a></li>
           <li class="nav-item"><a class="nav-link" href="/login">로그인</a></li>
-        <% } else { %>
 
-          <% if (['krogy', 'admin'].includes(user.username)) { %>
-            
+        <% } else { %>
+          <!-- DB에 등록된 관리자 계정만 관리자 메뉴 출력 -->
+          <% if (isAdminUser) { %>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">관리자 메뉴</a>
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                관리자 메뉴
+              </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="/admin-pending">가입 승인 대기</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/users">라이더 목록</a></li>
-                <li><a class="dropdown-item" href="/promoReg">프로모션 등록</a></li>
-                <li><a class="dropdown-item" href="/accountTable">프로모션 결과 확인/공지</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/SetEvent">이벤트 등록</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/write">지급 정산서 등록</a></li>
-                <li><a class="dropdown-item" href="/accounts">기준 정산서 업로드</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/admin-register">관리자 등록</a></li>
-                <li><a class="dropdown-item" href="/ScoreTable">시간대별 점수</a></li>
+                <% if (user.username === 'admin') { %>
+                  <!-- 슈퍼관리자: 전체 메뉴 -->
+                  <li><a class="dropdown-item" href="/admin-pending">가입 승인 대기</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="/users">라이더 목록</a></li>
+                  <li><a class="dropdown-item" href="/promoReg">프로모션 등록</a></li>
+                  <li><a class="dropdown-item" href="/accountTable">프로모션 결과 확인/공지</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="/SetEvent">이벤트 등록</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="/write">지급 정산서 등록</a></li>
+                  <li><a class="dropdown-item" href="/accounts">기준 정산서 업로드</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="/admin-register">관리자 등록</a></li>
+                  <li><a class="dropdown-item" href="/ScoreTable">시간대별 점수</a></li>
+                <% } else { %>
+                  <!-- 일반 관리자: 가입 승인 대기, 라이더 목록만 -->
+                  <li><a class="dropdown-item" href="/admin-pending">가입 승인 대기</a></li>
+                  <li><a class="dropdown-item" href="/users">라이더 목록</a></li>
+                <% } %>
               </ul>
             </li>
           <% } %>
-          
+
+          <!-- 프로모션 공지 -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">프로모션 공지</a>
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              프로모션 공지
+            </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="/promoPage">프로모션 공지</a></li>
               <li><a class="dropdown-item" href="/my-promoPage">나의 프로모션 확인</a></li>
             </ul>
           </li>
+
           <li class="nav-item"><a class="nav-link" href="/ScoreTable">시간대별 현황</a></li>
 
+          <!-- 마이 페이지 -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">마이 페이지</a>
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              마이 페이지
+            </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="/my-page">나의 등록 정보</a></li>
               <li><a class="dropdown-item" href="/my-posts">정산서 리스트</a></li>
@@ -87,12 +105,9 @@
           </li>
 
           <li class="nav-item"><a class="nav-link" href="/logout">로그아웃</a></li>
-
         <% } %>
 
       </ul>
     </div>
   </div>
 </nav>
-
-

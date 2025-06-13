@@ -48,6 +48,19 @@ app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
+// 모든 요청에 대해 user를 세팅한 다음에
+app.use(async (req, res, next) => {
+  const user = req.session.user;
+  if (user && req.app.locals.db) {
+    const adminDoc = await req.app.locals.db
+      .collection('admins')
+      .findOne({ username: user.username });
+    res.locals.isAdminUser = !!adminDoc;
+  } else {
+    res.locals.isAdminUser = false;
+  }
+  next();
+});
 
 let db;
 const url = 'mongodb+srv://krogy123:rlarudfhr1262@cluster0.qnjcx2e.mongodb.net/?retryWrites=true&w=majority&tls=true&tlsAllowInvalidCertificates=true';
@@ -275,10 +288,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-// 로그인 실패 페이지
-app.get('/login-fail', (req, res) => {
-  res.render('login-fail');
-});
+
 
 // 가입 승인 대기 페이지
 app.get('/approved', (req, res) => {
@@ -566,17 +576,14 @@ app.post('/post/:id/confirm', 로그인필요, async (req, res) => {
 
 // 수정 폼 페이지
 app.get('/edit-user/:id', 로그인필요, isAdmin, async (req, res) => {
-  try {
-    const user = await db.collection('users').findOne({ _id: new ObjectId(req.params.id) });
-    if (!user) {
-      return res.status(404).send('사용자를 찾을 수 없습니다.');
-    }
-
-    res.render('edit-user', { title: '가입자 수정', user });
-  } catch (err) {
-    console.error('사용자 정보 조회 오류:', err);
-    res.status(500).send('서버 오류');
-  }
+  const editUser = await db.collection('users')
+                          .findOne({ _id: new ObjectId(req.params.id) });
+  const currentUser = req.session.user;
+  res.render('edit-user', {
+    title: '가입자 수정',
+    editUser,
+    currentUser
+  });
 });
 
 
@@ -613,7 +620,7 @@ app.post('/edit-user/:id', 로그인필요, isAdmin, async (req, res) => {
     );
 
     console.log(`✅ 사용자 정보 수정 완료: ${req.params.id}`);
-    res.redirect('/user-list');
+    res.redirect('/users');
     
   } catch (err) {
     console.error('❌ 사용자 수정 실패:', err);
@@ -625,7 +632,7 @@ app.post('/edit-user/:id', 로그인필요, isAdmin, async (req, res) => {
 app.get('/user-list', async (req, res) => {
   try {
     const users = await db.collection('users').find({}).toArray();
-    res.render('user-list', { users });
+    res.render('users', { users });
   } catch (error) {
     console.error('유저 목록 로딩 오류:', error);
     res.status(500).send('서버 오류 발생');
@@ -1041,7 +1048,7 @@ app.delete('/promo-result/:id', 로그인필요, async (req, res) => {
 });
 
 // 🔹 관리자 페이지 렌더링
-app.get('/admin-register', async (req, res) => {
+app.get('/admin-register', 로그인필요, isAdmin, async (req, res) => {
   try {
     const admins = await db.collection('admins').find().sort({ createdAt: -1 }).toArray();
     res.render('admin-register', { adminList: admins });
@@ -1051,7 +1058,7 @@ app.get('/admin-register', async (req, res) => {
 });
 
 // 🔹 관리자 추가
-app.post('/admin-register/add', async (req, res) => {
+app.post('/admin-register/add', 로그인필요, isAdmin, async (req, res) => {
   const { name, username } = req.body;
   if (!name || !username) return res.status(400).send('이름 또는 아이디 누락');
 
@@ -1068,18 +1075,20 @@ app.post('/admin-register/add', async (req, res) => {
 });
 
 // 🔹 관리자 삭제
-app.post('/admin-register/delete', async (req, res) => {
-  const { username } = req.body;
-  if (!username) return res.status(400).send('아이디 누락');
-
-  try {
+app.post(
+  '/admin-register/delete',
+  로그인필요,
+  isAdmin,
+  async (req, res) => {
+    const { username } = req.body;
+    if (!username) return res.status(400).send('아이디 누락');
+    if (username === 'admin') {
+      return res.status(403).send('기본 관리자 계정은 삭제할 수 없습니다.');
+    }
     await db.collection('admins').deleteOne({ username });
     res.status(200).send('삭제 성공');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('삭제 실패');
   }
-});
+);
 
 app.get('/admin-pending', async (req, res) => {
   const db = req.app.locals.db;
