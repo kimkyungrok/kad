@@ -1,17 +1,24 @@
 <% layout('layout') %>
 
-<!-- 작성일 입력 -->
+<!-- 작성일(프로모션 선택) 입력 -->
 <div class="container my-4">
   <form id="checkForm" class="row g-2 align-items-center">
     <div class="col-auto">
-      <label for="writtenDate" class="form-label">작성일:</label>
+      <label for="promoSelect" class="form-label">프로모션 선택:</label>
     </div>
     <div class="col-auto">
-      <input type="date" id="writtenDate" class="form-control" required>
+      <select id="promoSelect" class="form-select" required>
+        <option value="" disabled selected>-- 프로모션을 선택하세요 --</option>
+        <% promos.forEach((promo, idx) => { %>
+          <option value="<%= idx %>">
+            <%= new Date(promo.createdAt).toISOString().slice(0,10) %> — <%= promo.title %>
+          </option>
+        <% }) %>
+      </select>
     </div>
     <div class="col-auto">
       <button type="submit" class="btn btn-primary">확인</button>
-      <button id="savePromoResult" class="btn btn-success">프로모션 결과 공지</button>
+      <button id="savePromoResult" type="button" class="btn btn-success">프로모션 결과 공지</button>
     </div>
   </form>
 </div>
@@ -27,116 +34,83 @@
     </tr>
   </thead>
   <tbody id="riderTableBody">
-    <% riderData.forEach((item, index) => { %>
-    <tr data-rank="<%= item.rank %>" data-name="<%= item.name %>">
+    <% riderData.forEach(item => { %>
+      <tr data-rank="<%= item.rank %>">
         <td><%= item.name %></td>
         <td><%= item.value.toLocaleString() %></td>
         <td><%= item.rank || '-' %></td>
-        <td class="payCell"></td> <!-- 이 칸에 지급액 자동 입력 -->
+        <td class="payCell">0</td>
       </tr>
     <% }) %>
   </tbody>
 </table>
 
-<!-- 지급액 자동 입력 스크립트 -->
 <script>
+  // 서버에서 주입된 promos 배열
   const promos = <%- JSON.stringify(promos || []) %>;
 
-  // 확인 버튼 이벤트
-  document.getElementById('checkForm').addEventListener('submit', function (e) {
+  // “확인” 버튼: 선택된 프로모션의 지급액을 테이블에 채웁니다.
+  document.getElementById('checkForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
-    const inputDate = document.getElementById('writtenDate').value;
-    if (!inputDate) return alert("작성일을 입력해주세요.");
-
-    console.log('🟡 사용자 입력 날짜:', inputDate);
-    console.log('🟡 promos 배열:', promos);
-
-    let matchedPromo = null;
-
-    promos.forEach((promo, index) => {
-      const promoDate = new Date(promo.createdAt).toISOString().slice(0, 10);
-      const type = promo.type;
-
-      console.log(`📄 [${index}] promoDate = ${promoDate}, type = ${type}`);
-      if (promoDate === inputDate && type === 'table') {
-        matchedPromo = promo;
-      }
-    });
-
-    if (!matchedPromo) {
-      alert("해당 작성일의 표 형식 프로모션이 없습니다.");
-      return;
+    const sel = document.getElementById('promoSelect').value;
+    if (!sel) {
+      return alert('프로모션을 선택해주세요.');
+    }
+    const matchedPromo = promos[parseInt(sel)];
+    if (!matchedPromo || !matchedPromo.content) {
+      return alert('선택된 프로모션 데이터가 없습니다.');
     }
 
-    alert(`✅ 프로모션 매칭됨:\n작성일: ${new Date(matchedPromo.createdAt).toISOString().slice(0, 10)}\n타입: ${matchedPromo.type}`);
-
-    const promoTable = matchedPromo.content;
-    const rows = document.querySelectorAll('#riderTableBody tr');
-
-    console.log('📋 프로모션 표 데이터:', promoTable);
-
-    rows.forEach((row, i) => {
-      const rank = parseInt(row.getAttribute('data-rank'));
-      const rankLabel = `${rank}등`;
-      let amount = '';
-
-      console.log(`🔍 Row ${i} 등수: ${rankLabel}`);
-
-      if (rank >= 1 && rank <= 5) {
-        Object.values(promoTable).forEach((rowObj, idx) => {
-          const values = Object.values(rowObj);
-          const label = values[0]?.toString().trim();
-          const value = values[1];
-
-          console.log(`  🔎 비교 ${idx}: label=${label}, value=${value}`);
-          if (label === rankLabel) {
-            amount = value;
-            console.log(`  ✅ 매칭됨: ${rankLabel} = ${value}`);
-          }
-        });
-
-        const cell = row.querySelector('.payCell');
-        if (amount && cell) {
-          cell.innerText = amount;
-          console.log(`💰 지급액 입력 완료: ${amount}`);
-        } else {
-          console.warn(`⚠️ 지급액 없음 또는 셀 오류: Row ${i}, amount=${amount}, cell=`, cell);
-        }
+    // content가 문자열로 저장됐다면 JSON으로 파싱
+    let promoTable = matchedPromo.content;
+    if (typeof promoTable === 'string') {
+      try {
+        promoTable = JSON.parse(promoTable);
+      } catch {
+        return alert('프로모션 데이터 파싱 오류');
       }
+    }
+
+    // 각 행의 data-rank와 비교하여 payCell에 지급액 입력
+    document.querySelectorAll('#riderTableBody tr').forEach(row => {
+      const rankLabel = row.getAttribute('data-rank'); // e.g. "1등"
+      let amount = '0';
+      Object.values(promoTable).forEach(r => {
+        const [label, value] = Object.values(r);
+        if ((label||'').trim() === rankLabel) {
+          amount = value;
+        }
+      });
+      row.querySelector('.payCell').innerText = amount;
     });
   });
 
-  // 📢 프로모션 결과 공지 버튼 이벤트
-  document.getElementById('savePromoResult')?.addEventListener('click', () => {
-    const rows = Array.from(document.querySelectorAll('#riderTableBody tr')).map(row => {
-      return {
-        name: row.querySelector('td:nth-child(1)')?.innerText || '',
-        value: row.querySelector('td:nth-child(2)')?.innerText || '',
-        rank: row.querySelector('td:nth-child(3)')?.innerText || '',
-        pay: row.querySelector('.payCell')?.innerText || ''
-      };
-    });
-
-    const writtenDate = document.getElementById('writtenDate').value;
-
-    if (!writtenDate) {
-      alert('작성일을 입력해야 프로모션 결과를 공지할 수 있습니다.');
-      return;
+  // “프로모션 결과 공지” 버튼: 테이블 데이터를 서버로 전송
+  document.getElementById('savePromoResult').addEventListener('click', () => {
+    const sel = document.getElementById('promoSelect').value;
+    if (!sel) {
+      return alert('먼저 프로모션을 확인해주세요.');
     }
+    const rows = Array.from(document.querySelectorAll('#riderTableBody tr')).map(r => ({
+      name:  r.cells[0].innerText,
+      value: r.cells[1].innerText,
+      rank:  r.cells[2].innerText,
+      pay:   r.querySelector('.payCell').innerText
+    }));
+    const createdAt = promos[parseInt(sel)].createdAt;
 
     fetch('/save-promo-result', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: writtenDate, data: rows })
+      body: JSON.stringify({ date: createdAt, data: rows })
     })
     .then(res => res.json())
-    .then(data => {
-      alert(data.message || '저장 완료');
-      window.location.href = '/my-promoPage';
+    .then(json => {
+      alert(json.message || '저장 완료');
+      location.href = '/my-promoPage';
     })
     .catch(err => {
-      console.error('❌ 저장 실패:', err);
+      console.error(err);
       alert('서버 오류: 저장에 실패했습니다.');
     });
   });
