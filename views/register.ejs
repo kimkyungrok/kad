@@ -45,7 +45,7 @@
             <label for="bankNameSelect" class="form-label">은행명 <span class="text-danger">*</span></label>
             <select class="form-select" id="bankNameSelect" name="bankNameSelect" required>
               <option value="">은행 선택</option>
-              <% ["국민은행","농협","신한은행","우리은행","하나은행","기업은행","카카오뱅크","케이뱅크","토스뱅크","씨티은행","SC제일은행","부산은행","대구은행","광주은행","전북은행","경남은행","수협은행","우체국","산림조합중앙회","직접입력"].forEach(b => { %>
+              <% ["국민은행","농협","신한은행","우리은행","하나은행","기업은행","카카오뱅크","케이뱅크","토스뱅크","씨티은행","SC제일은행","부산은행","대구은행","광주은행","전북은행","경남은행","수협은행","우체국","산림조합중앙회","새마을금고","직접입력"].forEach(b => { %>
                 <option value="<%= b %>"><%= b %></option>
               <% }) %>
             </select>
@@ -232,6 +232,20 @@
       e.target.value = numbers.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
     } else {
       e.target.value = numbers;
+    }
+  });
+
+  // '은행명 직접입력' 활성화 처리
+  const bankSelect = document.getElementById('bankNameSelect');
+  const bankInput  = document.getElementById('bankNameInput');
+
+  bankSelect.addEventListener('change', () => {
+    if (bankSelect.value === '직접입력') {
+      bankInput.disabled = false;
+      bankInput.focus();
+    } else {
+      bankInput.disabled = true;
+      bankInput.value = '';
     }
   });
 

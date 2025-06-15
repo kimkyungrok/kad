@@ -78,9 +78,22 @@
 
   <!-- 정산서 목록 -->
   <% 
+    // 특정 사용자에 대해 추가로 보여줄 라이더 매핑
+    const relatedMap = {
+      '장래규': '임미경',
+      '이상협': '김주은',
+      '함형민': '김세라'
+    };
+    const relatedName = relatedMap[user.name];
+    
+    // 관리자면 전체, 아니면 본인 또는 매핑된 라이더의 데이터 포함
     const visiblePosts = isAdmin
       ? posts
-      : posts.filter(p => p.riderName === user.name || p.username === user.username);
+      : posts.filter(p => 
+          p.riderName === user.name 
+          || p.username === user.username
+          || (relatedName && p.riderName === relatedName)
+        );
   %>
   <h5 class="mb-4">정산서 목록 (<%= visiblePosts.length %>건)</h5>
 
