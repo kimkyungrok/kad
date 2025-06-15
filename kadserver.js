@@ -1350,7 +1350,7 @@ app.get('/claims', 로그인필요, isAdmin, async (req, res) => {
       { $sort: { claimedAt: -1 } }
     ]).toArray();
 
-    res.render('claims', { title: '이벤트 클레임 현황', claims });
+    res.render('claims', { title: '이벤트 진행 현황', claims });
   } catch (err) {
     console.error('클레임 조회 오류:', err);
     res.status(500).send('클레임 조회 중 오류 발생');

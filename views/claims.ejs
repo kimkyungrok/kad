@@ -4,12 +4,13 @@
   <h2 class="mb-4"><%= title %></h2>
 
   <% if (claims.length === 0) { %>
-    <p>아직 클레임된 이벤트가 없습니다.</p>
+    <p>아직 진행된 이벤트가 없습니다.</p>
   <% } else { %>
     <div class="table-responsive">
       <table class="table table-striped table-bordered align-middle text-center">
         <thead class="table-light">
           <tr>
+            <th>#</th>
             <th>이벤트명</th>
             <th>유저 아이디</th>
             <th>이름</th>
@@ -17,8 +18,9 @@
           </tr>
         </thead>
         <tbody>
-          <% claims.forEach(c => { %>
+          <% claims.forEach((c, i) => { %>
             <tr>
+              <td><%= i + 1 %></td>
               <td><%= c.eventTitle %></td>
               <td><%= c.userId %></td>
               <td><%= c.userName %></td>
@@ -30,7 +32,7 @@
     </div>
   <% } %>
 
-  <div class="mt-4">
+  <!-- <div class="mt-4">
     <a href="/SetEvent" class="btn btn-secondary">← 이벤트 관리로 돌아가기</a>
-  </div>
+  </div> -->
 </div>
