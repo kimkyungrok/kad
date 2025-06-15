@@ -1314,3 +1314,45 @@ app.post('/delete-event/:id', 로그인필요, isAdmin, async (req, res) => {
     res.status(500).send('이벤트 삭제 중 서버 오류 발생');
   }
 });
+
+// 로그인·관리자 권한 필요
+app.get('/claims', 로그인필요, isAdmin, async (req, res) => {
+  try {
+    // MongoDB aggregation 으로 이벤트 제목·유저 이름까지 함께 가져오기
+    const claims = await db.collection('claims').aggregate([
+      {
+        $lookup: {
+          from: 'events',
+          localField: 'eventId',
+          foreignField: '_id',
+          as: 'event'
+        }
+      },
+      { $unwind: '$event' },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: 'username',
+          as: 'user'
+        }
+      },
+      { $unwind: '$user' },
+      {
+        $project: {
+          _id: 1,
+          eventTitle: '$event.title',
+          userId: 1,
+          userName: '$user.name',
+          claimedAt: 1
+        }
+      },
+      { $sort: { claimedAt: -1 } }
+    ]).toArray();
+
+    res.render('claims', { title: '이벤트 클레임 현황', claims });
+  } catch (err) {
+    console.error('클레임 조회 오류:', err);
+    res.status(500).send('클레임 조회 중 오류 발생');
+  }
+});

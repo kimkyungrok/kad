@@ -1,0 +1,36 @@
+<% layout('layout') %>
+
+<div class="container my-5">
+  <h2 class="mb-4"><%= title %></h2>
+
+  <% if (claims.length === 0) { %>
+    <p>아직 클레임된 이벤트가 없습니다.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th>이벤트명</th>
+            <th>유저 아이디</th>
+            <th>이름</th>
+            <th>이용 시간</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% claims.forEach(c => { %>
+            <tr>
+              <td><%= c.eventTitle %></td>
+              <td><%= c.userId %></td>
+              <td><%= c.userName %></td>
+              <td><%= new Date(c.claimedAt).toLocaleString('ko-KR') %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+  <div class="mt-4">
+    <a href="/SetEvent" class="btn btn-secondary">← 이벤트 관리로 돌아가기</a>
+  </div>
+</div>
