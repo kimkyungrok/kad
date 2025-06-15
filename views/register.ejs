@@ -4,7 +4,7 @@
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-12 col-md-10 col-lg-8">
-      <h2 class="mb-4 text-center">기사 정보 등록 및 사이트 가입</h2>
+      <h2 class="mb-4 text-center">정보 등록 및 가입</h2>
       <form id="registerForm" action="/register" method="POST">
 
         <!-- 아이디 입력 그룹 -->
@@ -154,7 +154,7 @@
 
   // 회원가입 폼 제출
   document.getElementById('registerForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // 기본 폼 제출 방지
+    event.preventDefault();
 
     const formData = new FormData(this);
     const data = new URLSearchParams(formData);
@@ -165,9 +165,17 @@
     })
     .then(response => response.json())
     .then(data => {
-      document.getElementById('modalMessage').textContent = data.message; // 모달에 메시지 설정
-      const myModal = new bootstrap.Modal(document.getElementById('alertModal'));
-      myModal.show();  // 모달 표시
+      // 모달 메시지 설정
+      document.getElementById('modalMessage').textContent = data.message;
+      const modalEl = document.getElementById('alertModal');
+      const myModal = new bootstrap.Modal(modalEl);
+
+      // 모달이 완전히 숨겨진 후 로그인 페이지로 이동
+      modalEl.addEventListener('hidden.bs.modal', () => {
+        window.location.href = '/login';
+      }, { once: true });
+
+      myModal.show();
     })
     .catch(error => {
       console.error('회원가입 오류:', error);
