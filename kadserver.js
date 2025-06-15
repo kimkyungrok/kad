@@ -134,7 +134,7 @@ app.get('/', 로그인필요, async (req, res) => {
   const uploadedImagePath = setting ? setting.value : null;
 
   res.render('home', {
-    title: '홈페이지',
+    title:  'KAD 라이더 시스템',
     user: currentUser,
     uploadedImagePath  // 이거 꼭 넘긴다!
   });
@@ -142,7 +142,7 @@ app.get('/', 로그인필요, async (req, res) => {
 
 // 회원가입 페이지
 app.get('/register', (req, res) => {
-  res.render('register', { title: '회원가입' });
+  res.render('register', { title:  'KAD 라이더 시스템' });
 });
 
 // 환영 페이지
@@ -155,7 +155,7 @@ app.get('/welcome', 로그인필요, async (req, res) => {
   const activeEvent = await db.collection('events').findOne({ status: 'active' });
 
   res.render('welcome', {
-    title: '환영 페이지',
+    title: 'KAD 라이더 시스템',
     user: currentUser,
     uploadedImagePath,
     activeEvent  // ✅ 진행중 이벤트 1개 전달
@@ -167,7 +167,7 @@ app.get('/welcome', 로그인필요, async (req, res) => {
 
 // 로그인 실패 페이지
 app.get('/login-fail', (req, res) => {
-  res.render('login-fail', { title: '로그인 실패' });
+  res.render('login-fail', { title: 'KAD 라이더 시스템' });
 });
 
 
@@ -259,7 +259,7 @@ app.post('/register', async (req, res) => {
 
 // 로그인 페이지
 app.get('/login', (req, res) => {
-  res.render('login', { title: '로그인' });
+  res.render('login', { title: 'KAD 라이더 시스템' });
 });
 
 // 로그인 처리 (로그인 성공 시 환영 화면으로 이동)
@@ -330,7 +330,7 @@ app.get('/my-posts', 로그인필요, async (req, res) => {
       .toArray();
 
     res.render('my-posts', {
-      title: '내 게시판',
+      title: 'KAD 라이더 시스템',
       posts,
       user: currentUser,
       allUsers
@@ -346,7 +346,7 @@ app.get('/my-posts', 로그인필요, async (req, res) => {
 app.get('/users', 로그인필요, isAdmin, async (req, res) => {
   try {
     const users = await db.collection('users').find().toArray();
-    res.render('users', { title: '등록된 유저 목록', users });
+    res.render('users', { title: 'KAD 라이더 시스템', users });
   } catch (err) {
     console.error(err);
     res.status(500).send('유저 목록 불러오기 실패');
@@ -382,7 +382,7 @@ app.get('/write', 로그인필요, async (req, res) => {
     };
   }
 
-  res.render('write', { title: '정보 등록',latestPromo});
+  res.render('write', { title: 'KAD 라이더 시스템',latestPromo});
 });
 
 
@@ -580,7 +580,7 @@ app.get('/edit-user/:id', 로그인필요, isAdmin, async (req, res) => {
                           .findOne({ _id: new ObjectId(req.params.id) });
   const currentUser = req.session.user;
   res.render('edit-user', {
-    title: '가입자 수정',
+    title: 'KAD 라이더 시스템',
     editUser,
     currentUser
   });
@@ -701,7 +701,7 @@ app.post('/upload-welcome-image',로그인필요, isAdmin,upload.single('welcome
 let excelData = {}; // 메모리에 저장 (간단 버전)
 
 app.get('/accounts', (req, res) => {
-  res.render('accounts', { title: '엑셀 업로드' });
+  res.render('accounts', { title: 'KAD 라이더 시스템' });
 });
 
 // 엑셀 업로드
@@ -999,7 +999,7 @@ app.get('/my-promoPage', 로그인필요, async (req, res) => {
   }
 
   res.render('my-promoPage', {
-    title: '프로모션 결과 확인',
+    title: 'KAD 라이더 시스템',
     user,
     latestPromo: latestPromo[0] || null,
     allPromos
@@ -1122,7 +1122,7 @@ app.get('/ScoreTable', 로그인필요, async (req, res) => {
   const savedAt = scoreDoc?.updatedAt || null; // <-- 이 부분에서 const 키워드 필요
 
   res.render('ScoreTable', {
-    title: '시간대별 점수',
+    title: 'KAD 라이더 시스템',
     currentUser: user,
     adminList,
     allScoreData: savedScore,
@@ -1212,7 +1212,7 @@ app.get('/SetEvent', 로그인필요, isAdmin, async (req, res) => {
     ]);
 
     res.render('SetEvent', {
-      title: '이벤트 등록',
+      title: 'KAD 라이더 시스템',
       activeEvents,
       doneEvents
     });
@@ -1350,7 +1350,7 @@ app.get('/claims', 로그인필요, isAdmin, async (req, res) => {
       { $sort: { claimedAt: -1 } }
     ]).toArray();
 
-    res.render('claims', { title: '이벤트 진행 현황', claims });
+    res.render('claims', { title: 'KAD 라이더 시스템', claims });
   } catch (err) {
     console.error('클레임 조회 오류:', err);
     res.status(500).send('클레임 조회 중 오류 발생');
