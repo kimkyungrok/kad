@@ -78,7 +78,6 @@
 
   <!-- 정산서 목록 -->
   <% 
-    // 관리자는 전체 posts, 그 외는 본인(riderName or username) 것만
     const visiblePosts = isAdmin
       ? posts
       : posts.filter(p => p.riderName === user.name || p.username === user.username);
@@ -126,23 +125,22 @@
         </tbody>
       </table>
     </div>
-  </form>
 
-  <!-- 하단 버튼 -->
-  <div class="mt-4 d-flex justify-content-center">
-    <div class="btn-group btn-group-sm w-100" role="group" aria-label="하단 버튼 그룹">
-      <% if (isAdmin) { %>
-        <button type="submit" class="btn btn-danger flex-fill" style="font-size: 12px;"
-          onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
-      <% } %>
+    <!-- 하단 버튼 -->
+    <div class="mt-4 d-flex justify-content-center">
+      <div class="btn-group btn-group-sm w-100" role="group" aria-label="하단 버튼 그룹">
+        <% if (isAdmin) { %>
+          <button type="submit" class="btn btn-danger flex-fill" style="font-size: 12px;" onclick="return confirm('선택한 게시글을 삭제하시겠습니까?')">선택 삭제</button>
+        <% } %>
 
-      <a href="/welcome" class="btn btn-secondary flex-fill" style="font-size: 12px;">홈으로</a>
+        <a href="/welcome" class="btn btn-secondary flex-fill" style="font-size: 12px;">홈으로</a>
 
-      <% if (isAdmin) { %>
-        <a href="/write" class="btn btn-primary flex-fill" style="font-size: 12px;">정산서 등록</a>
-      <% } %>
+        <% if (isAdmin) { %>
+          <a href="/write" class="btn btn-primary flex-fill" style="font-size: 12px;">정산서 등록</a>
+        <% } %>
+      </div>
     </div>
-  </div>
+  </form>
 
 </div>
 
